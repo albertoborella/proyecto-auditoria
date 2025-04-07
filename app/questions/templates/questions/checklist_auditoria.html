@@ -1,0 +1,88 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<style>
+    .observaciones {
+        display: none;
+        margin-top: 10px;
+    }
+</style>
+<div class="container">
+    <h1 class="titulo-final-auditoria">Checklist para Auditoría de {{ auditoria.cliente }} el {{ auditoria.fecha }}</h1>
+    <br>
+    <form method="post">
+        {% csrf_token %}
+        {% for pregunta in preguntas %}
+        <div class="container">
+            <div class="card">
+                <div class="card-body {% if pregunta.texto_critico %} texto-critico {% endif %}">
+                    {{ pregunta.texto }}
+                </div>
+            </div>
+            <div class="radio-container">
+                <label class="custom-radio">
+                    <input type="radio" name="pregunta_{{ pregunta.id }}" value="correcto" onclick="toggleObservaciones({{ pregunta.id }})"> Correcto
+                </label>
+                <label class="custom-radio">
+                    <input type="radio" name="pregunta_{{ pregunta.id }}" value="parcialmente_correcto" onclick="toggleObservaciones({{ pregunta.id }})" {% if pregunta.texto_critico %} disabled {% endif %}> Parcialmente Correcto
+                </label>
+                <label class="custom-radio">
+                    <input type="radio" name="pregunta_{{ pregunta.id }}" value="no_correcto" onclick="toggleObservaciones({{ pregunta.id }})" {% if pregunta.texto_critico %} disabled {% endif %}> No Correcto
+                </label>
+                <label class="custom-radio">
+                    <input type="radio" name="pregunta_{{ pregunta.id }}" value="critica" onclick="toggleObservaciones({{ pregunta.id }})" {% if not pregunta.texto_critico %} disabled {% endif %}> Crítico
+                </label>
+                <div id="observaciones_{{ pregunta.id }}" class="observaciones">
+                    <label for="observaciones-text_{{ pregunta.id }}">Observaciones:</label><br>
+                    <textarea id="observaciones-text_{{ pregunta.id }}" name="observaciones-text_{{ pregunta.id }}" rows="4" cols="60"></textarea>
+                </div>
+            </div>
+        </div>
+        <br>
+        {% empty %}
+        <li>No hay preguntas disponibles.</li>
+        {% endfor %}
+        <br><br>
+        <div style="text-align: center;">
+            <p class="leyenda-advertencia">Una vez que se envíen las respuestas no podrán ser modificadas. Será necesario eliminar toda la auditoría.</p>
+            <button class="btn btn-primary center" type="submit">Enviar Respuestas</button>
+            <button class="btn btn-warning center"><a href="{% url 'home' %}">Cancelar</a></button>
+        </div>
+    </form>
+</div> 
+<br><br>
+<script>
+    function toggleObservaciones(preguntaId) {
+        const observacionesDiv = document.getElementById("observaciones_" + preguntaId);
+        const radios = document.getElementsByName("pregunta_" + preguntaId);
+        let showObservaciones = false;
+        // Verifica si la pregunta es crítica
+        const esCritico = document.querySelector('input[name="pregunta_' + preguntaId + '"][value="critica"]').disabled === false;
+        // Habilita o deshabilita las opciones según si la pregunta es crítica
+        if (esCritico) {
+            // Si es crítica, solo habilita Correcto y Crítico
+            for (let radio of radios) {
+                if (radio.value !== "correcto" && radio.value !== "critica") {
+                    radio.disabled = true;
+                } else {
+                    radio.disabled = false; // Habilita Correcto y Crítico
+                }
+            }
+        } else {
+            // Para preguntas no críticas, habilita todas las opciones
+            for (let radio of radios) {
+                radio.disabled = false;
+            }
+        }
+        // Verifica si se debe mostrar el área de observaciones
+        for (let radio of radios) {
+            if (radio.checked && (radio.value === "parcialmente_correcto" || radio.value === "no_correcto" || radio.value === "critica")) {
+                showObservaciones = true;
+                break;
+            }
+        }
+        observacionesDiv.style.display = showObservaciones ? "block" : "none";
+    }
+</script>            
+{% endblock %}
+
+

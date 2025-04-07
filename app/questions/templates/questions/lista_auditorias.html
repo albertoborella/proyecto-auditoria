@@ -1,0 +1,34 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<div class="container">
+    <h1 class="titulo-listado">Lista de Auditorías</h1>
+    <table class="table table-sm" style="width: 100%;">
+        <thead>
+            <tr class="table-primary">
+                <th>Fecha de Auditoría</th>
+                <th>Cliente</th>
+                <th>Auditor</th>
+                <th>Puntaje</th>
+                <th>Resultado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in auditorias %}
+            <tr class="table-active">
+                <td>{{ item.auditoria.fecha }}</td>
+                <td>{{ item.auditoria.cliente }}</td>
+                <td>{{ item.auditoria.auditor }}</td>
+                <td>{{ item.puntaje_total }}</td>
+                <td>{{ item.resultado }}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger">
+                        <a class="eliminar" href="{% url 'eliminar_auditoria' item.auditoria.id %}">Eliminar</a>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'questions/base.html' %}
+
+{% block content %}
+<div class="container-sm">
+    <div class="title_button">
+        <h1 class="titulo-listado">Nueva auditoría</h1>
+        <button type="button" class="btn btn-sm btn-secondary"><a class="cancelar"
+                href="{% url 'home' %}">Cancelar</a></button>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-secondary btn-md-block button_nueva_auditoria">Crear Auditoría</button>
+    </form>
+</div>
+{% endblock %}

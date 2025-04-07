@@ -1,0 +1,2 @@
+django == 4.2
+weasyprint == 65.0

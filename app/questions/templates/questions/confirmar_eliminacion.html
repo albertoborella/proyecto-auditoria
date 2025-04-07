@@ -1,0 +1,17 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<div class="container">
+        <h1 style="font-size: 22px; font-family: Arial, Helvetica, sans-serif; text-align: center; color: red;">Confirmar Eliminación</h1>
+        <p style="font-size: 16px; font-family: Arial, Helvetica, sans-serif; text-align: center;">¿Estás seguro de que deseas eliminar la auditoría "{{ auditoria }}"?</p>
+        <hr>
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex;
+                        flex-wrap: wrap;
+                        justify-content: center;">
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+                <a href="{% url 'lista_auditorias' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+</div>
+{% endblock %}
