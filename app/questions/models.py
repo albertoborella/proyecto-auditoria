@@ -1,14 +1,18 @@
 from django.db import models
 from django.db.models import Sum, Count
 
+class Checklist(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
 class PreguntaPredefinida(models.Model):
     texto = models.TextField()
     texto_critico = models.BooleanField(default=False)
     numero_pregunta = models.IntegerField(blank=True, null=True)
+    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE, related_name='preguntas')
     
-    class Meta():
-        ordering = ['numero_pregunta']
-
     class Meta():
         ordering = ['numero_pregunta']
 
@@ -35,7 +39,8 @@ class Auditoria(models.Model):
     auditor = models.ForeignKey(Auditor, on_delete=models.CASCADE)
     auditores_acompanantes = models.CharField(verbose_name='Auditores acompañantes',max_length=255, blank=True, null=True)
     lineas_auditadas = models.CharField(verbose_name='Lineas de producción auditadas',max_length=255, blank=True, null=True)
-
+    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE)
+    
     def __str__(self):
         return f"Auditoría de {self.cliente} realizada por {self.auditor} el {self.fecha}"
      

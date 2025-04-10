@@ -4,6 +4,7 @@ from django.db.models import Sum
 from django.contrib import messages
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from weasyprint import HTML
 from .forms import AuditoriaForm
 from .models import Auditoria, PreguntaPredefinida, Respuesta
@@ -20,10 +21,10 @@ def crear_auditoria(request):
             auditoria = form.save()  
             print(auditoria)
             # Crear preguntas predefinidas para la auditoria
-            preguntas = PreguntaPredefinida.objects.all()
+            #preguntas = PreguntaPredefinida.objects.all()
+            preguntas = PreguntaPredefinida.objects.filter(checklist=auditoria.checklist)
             for pregunta in preguntas:
                 Respuesta.objects.create(
-                    
                     pregunta_predefinida=pregunta,
                     auditoria=auditoria,
                     tipo_respuesta='correcto',
@@ -39,7 +40,7 @@ def crear_auditoria(request):
 @login_required
 def checklist_auditoria(request, auditoria_id):
     auditoria = get_object_or_404(Auditoria, id=auditoria_id)
-    preguntas = PreguntaPredefinida.objects.all()
+    preguntas = PreguntaPredefinida.objects.filter(checklist=auditoria.checklist)
     if request.method == 'POST':
         for pregunta in preguntas:
             tipo_respuesta = request.POST.get(f'pregunta_{pregunta.id}')
@@ -161,3 +162,9 @@ def resultado_auditoria_pdf(request, auditoria_id):
     # Necesitarás usar un enfoque diferente para incluir números de página.
     response.write(pdf)
     return response
+
+
+def obtener_preguntas_por_checklist(request):
+    checklist_id = request.GET.get('checklist_id')
+    preguntas = PreguntaPredefinida.objects.filter(checklist_id=checklist_id).values('id', 'texto')
+    return JsonResponse(list(preguntas), safe=False)

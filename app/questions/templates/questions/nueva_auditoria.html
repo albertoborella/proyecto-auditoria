@@ -6,21 +6,73 @@
         <h1 class="titulo-listado">Nueva auditoría</h1>
         <a href="{% url 'home' %}" class="btn btn-sm btn-secondary">Cancelar</a>
     </div>
-
     <form method="post" class="w-100">
         {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_checklist" class="form-label">Checklist</label>
+            {{ form.checklist }}
+        </div>
         <div class="row">
             {% for field in form %}
-                <div class="mb-3 col-md-6">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <div class="text-danger">{{ field.errors }}</div>
-                    {% endif %}
-                </div>
+            {% if field.name != 'checklist' %}
+            <div class="mb-3 col-md-6">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endif %}
             {% endfor %}
         </div>
-        <button type="submit" class="btn btn-primary mt-2">Crear Auditoría</button>
+        <div id="mensaje-preguntas" class="alert alert-info mt-3" role="alert">
+            ℹ️ Seleccione un checklist para ver cuántas preguntas contiene.
+        </div>
+        <button id="btn-crear" type="submit" class="btn btn-primary mt-2" disabled>Crear Auditoría</button>
+
     </form>
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    const checklistSelect = document.getElementById('id_checklist');
+    const btnCrear = document.getElementById('btn-crear');
+    const mensajePreguntas = document.getElementById('mensaje-preguntas');
+
+    checklistSelect.addEventListener('change', function () {
+        const checklistId = this.value;
+
+        fetch(`/ajax/preguntas/?checklist_id=${checklistId}`)
+            .then(response => response.json())
+            .then(data => {
+                const cantidad = data.length;
+
+                if (cantidad > 0) {
+                    mensajePreguntas.textContent = `✅ Este checklist incluye ${cantidad} pregunta${cantidad > 1 ? 's' : ''}.`;
+                    mensajePreguntas.className = 'alert alert-info mt-3';
+                    btnCrear.disabled = false;
+                } else {
+                    mensajePreguntas.textContent = '⚠️ Este checklist no tiene preguntas asociadas.';
+                    mensajePreguntas.className = 'alert alert-warning mt-3';
+                    btnCrear.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener preguntas:', error);
+                mensajePreguntas.textContent = '❌ Error al consultar las preguntas.';
+                mensajePreguntas.className = 'alert alert-danger mt-3';
+                btnCrear.disabled = true;
+            });
+    });
+
+    // Estado inicial al cargar la página
+    if (!checklistSelect.value) {
+        mensajePreguntas.textContent = 'ℹ️ Seleccione un checklist para ver cuántas preguntas contiene.';
+        mensajePreguntas.className = 'alert alert-info mt-3';
+        btnCrear.disabled = true;
+    }
+</script>
+{% endblock %}
+
+
