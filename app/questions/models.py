@@ -4,6 +4,14 @@ from django.db.models import Sum, Count
 class PreguntaPredefinida(models.Model):
     texto = models.TextField()
     texto_critico = models.BooleanField(default=False)
+    numero_pregunta = models.IntegerField(blank=True, null=True)
+    
+    class Meta():
+        ordering = ['numero_pregunta']
+
+    class Meta():
+        ordering = ['numero_pregunta']
+
     def __str__(self):
         return self.texto
 

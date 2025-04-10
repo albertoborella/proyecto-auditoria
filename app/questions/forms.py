@@ -9,15 +9,15 @@ class AuditoriaForm(forms.ModelForm):
             'fecha': forms.DateInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Seleccione la fecha',
-                'type': 'date'  
+                'type': 'date'
             }),
             'cliente': forms.Select(attrs={
-                'class': 'form-select', 
+                'class': 'form-select',
             }),
             'auditor': forms.Select(attrs={
-                'class': 'form-select',  
+                'class': 'form-select',
             }),
             'auditores_acompanantes': forms.TextInput(attrs={
-                'class': 'form-select',  
+                'class': 'form-control',  # ← Este es el correcto
             }),
         }

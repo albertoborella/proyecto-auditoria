@@ -1,16 +1,26 @@
 {% extends 'questions/base.html' %}
-
+{% load static %}
 {% block content %}
-<div class="container-sm">
-    <div class="title_button">
+<div class="container-sm mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="titulo-listado">Nueva auditoría</h1>
-        <button type="button" class="btn btn-sm btn-secondary"><a class="cancelar"
-                href="{% url 'home' %}">Cancelar</a></button>
+        <a href="{% url 'home' %}" class="btn btn-sm btn-secondary">Cancelar</a>
     </div>
-    <form method="post">
+
+    <form method="post" class="w-100">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-secondary btn-md-block button_nueva_auditoria">Crear Auditoría</button>
+        <div class="row">
+            {% for field in form %}
+                <div class="mb-3 col-md-6">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Crear Auditoría</button>
     </form>
 </div>
 {% endblock %}

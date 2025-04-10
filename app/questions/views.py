@@ -3,14 +3,16 @@ from django.http import HttpResponse
 from django.db.models import Sum
 from django.contrib import messages
 from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
 from weasyprint import HTML
 from .forms import AuditoriaForm
 from .models import Auditoria, PreguntaPredefinida, Respuesta
 
-
+@login_required
 def home(request):
     return render(request, 'questions/home.html')
 
+@login_required
 def crear_auditoria(request):
     if request.method == 'POST':
         form = AuditoriaForm(request.POST)  
@@ -21,6 +23,7 @@ def crear_auditoria(request):
             preguntas = PreguntaPredefinida.objects.all()
             for pregunta in preguntas:
                 Respuesta.objects.create(
+                    
                     pregunta_predefinida=pregunta,
                     auditoria=auditoria,
                     tipo_respuesta='correcto',
@@ -33,6 +36,7 @@ def crear_auditoria(request):
         form = AuditoriaForm()
     return render(request, 'questions/nueva_auditoria.html', {'form': form})
 
+@login_required
 def checklist_auditoria(request, auditoria_id):
     auditoria = get_object_or_404(Auditoria, id=auditoria_id)
     preguntas = PreguntaPredefinida.objects.all()
@@ -59,6 +63,7 @@ def checklist_auditoria(request, auditoria_id):
         'preguntas': preguntas
     })
 
+@login_required
 def resultado_auditoria(request, auditoria_id):
     auditoria = get_object_or_404(Auditoria, id=auditoria_id)
     preguntas = PreguntaPredefinida.objects.all()
@@ -97,7 +102,7 @@ def resultado_auditoria(request, auditoria_id):
         'comentario_general': '',  # Asegúrate de pasar un valor por defecto si no hay comentario
     })
 
-
+@login_required
 def lista_auditorias(request):
     auditorias = Auditoria.objects.all()
     auditorias_con_puntaje = []
@@ -115,7 +120,7 @@ def lista_auditorias(request):
         })
     return render(request, 'questions/lista_auditorias.html', {'auditorias': auditorias_con_puntaje})   
 
-
+@login_required
 def eliminar_auditoria(request, auditoria_id):
     auditoria = get_object_or_404(Auditoria, id=auditoria_id)
     
@@ -125,6 +130,7 @@ def eliminar_auditoria(request, auditoria_id):
         return redirect('lista_auditorias') 
     return render(request, 'questions/confirmar_eliminacion.html', {'auditoria': auditoria})
 
+@login_required
 def resultado_auditoria_pdf(request, auditoria_id):
     auditoria = get_object_or_404(Auditoria, id=auditoria_id)
     preguntas = PreguntaPredefinida.objects.all()
