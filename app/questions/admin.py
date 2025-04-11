@@ -8,7 +8,6 @@ class PreguntaPredefinidaAdmin(admin.ModelAdmin):
     search_fields = ('texto',)
     ordering = ('checklist', 'numero_pregunta')
 
-@admin.register(Checklist)
 class ChecklistAdmin(admin.ModelAdmin):
     list_display = ('nombre',)
     search_fields = ('nombre',)
@@ -17,3 +16,4 @@ admin.site.register(Cliente)
 admin.site.register(Auditor)
 admin.site.register(Auditoria)
 admin.site.register(Respuesta)
+admin.site.register(Checklist, ChecklistAdmin)
