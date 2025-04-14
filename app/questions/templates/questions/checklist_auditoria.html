@@ -1,4 +1,5 @@
 {% extends 'questions/base.html' %}
+{% load static %}
 {% block content %}
 <style>
     .observaciones {
@@ -49,7 +50,7 @@
             <button class="btn btn-warning center"><a href="{% url 'home' %}">Cancelar</a></button>
         </div>
     </form>
-</div> 
+</div>
 <br><br>
 <script>
     function toggleObservaciones(preguntaId) {
@@ -83,7 +84,7 @@
         }
         observacionesDiv.style.display = showObservaciones ? "block" : "none";
     }
-</script>            
+</script>
 {% endblock %}
 
 

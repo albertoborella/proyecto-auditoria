@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.db.models import Sum
 from django.contrib import messages
-from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
 from django.http import JsonResponse
 from weasyprint import HTML
 from .forms import AuditoriaForm
@@ -13,15 +13,14 @@ from .models import Auditoria, PreguntaPredefinida, Respuesta
 def home(request):
     return render(request, 'questions/home.html')
 
-@login_required
 def crear_auditoria(request):
     if request.method == 'POST':
-        form = AuditoriaForm(request.POST)  
+        form = AuditoriaForm(request.POST)
         if form.is_valid():
-            auditoria = form.save()  
+            print("Checklist enviado:", form.cleaned_data['checklist'])
+            auditoria = form.save()
             print(auditoria)
             # Crear preguntas predefinidas para la auditoria
-            #preguntas = PreguntaPredefinida.objects.all()
             preguntas = PreguntaPredefinida.objects.filter(checklist=auditoria.checklist)
             for pregunta in preguntas:
                 Respuesta.objects.create(
@@ -48,7 +47,7 @@ def checklist_auditoria(request, auditoria_id):
             if tipo_respuesta not in dict(Respuesta.OPCIONES_RESPUESTA):
                 print(f"Respuesta no válida para la pregunta {pregunta.id}: {tipo_respuesta}")
                 continue
-            
+
             respuesta, created = Respuesta.objects.get_or_create(
                 pregunta_predefinida=pregunta,
                 auditoria=auditoria,
@@ -57,10 +56,10 @@ def checklist_auditoria(request, auditoria_id):
             if not created:
                 respuesta.tipo_respuesta = tipo_respuesta
                 respuesta.observaciones = observaciones  # Actualiza las observaciones
-                respuesta.save() 
+                respuesta.save()
         return redirect('resultado_auditoria', auditoria_id=auditoria.id)
     return render(request, 'questions/checklist_auditoria.html', {
-        'auditoria': auditoria, 
+        'auditoria': auditoria,
         'preguntas': preguntas
     })
 
@@ -71,12 +70,12 @@ def resultado_auditoria(request, auditoria_id):
     respuestas = Respuesta.objects.filter(auditoria=auditoria)
     resultados = Respuesta.calcular_resultados(auditoria)
     puntaje_total = sum(respuesta.puntaje for respuesta in respuestas)
-    
+
     if request.method == 'POST':
         # Captura el comentario general
         comentario_general = request.POST.get('comentario_general', '')
         request.session['comentario_general'] = comentario_general  # Guardar en la sesión
-        
+
         # Procesa las respuestas
         for pregunta in preguntas:
             tipo_respuesta = request.POST.get(f'pregunta_{pregunta.id}')
@@ -89,10 +88,10 @@ def resultado_auditoria(request, auditoria_id):
                 if not created:
                     respuesta.tipo_respuesta = tipo_respuesta
                     respuesta.save()
-        
+
         # Redirigir a la función que genera el PDF
         return redirect('resultado_auditoria_pdf', auditoria_id=auditoria.id)
-    
+
     # Si no es un POST, solo renderiza la plantilla
     return render(request, 'questions/resultado_auditoria.html', {
         'auditoria': auditoria,
@@ -108,27 +107,35 @@ def lista_auditorias(request):
     auditorias = Auditoria.objects.all()
     auditorias_con_puntaje = []
     for auditoria in auditorias:
-        puntaje_total = Respuesta.objects.filter(auditoria=auditoria).aggregate(Sum('puntaje'))['puntaje__sum'] or 0
-        # Calcular el resultado basado en el puntaje total
-        if puntaje_total >= puntaje_total * 0.75:  # Suponiendo que 75 es el puntaje mínimo para aprobar
-            resultado = "ACEPTADO"
+        respuestas = Respuesta.objects.filter(auditoria=auditoria)
+        puntaje_total = respuestas.aggregate(Sum('puntaje'))['puntaje__sum'] or 0
+        puntaje_maximo = respuestas.count() * 1  # Suponiendo 4 como el puntaje máximo por respuesta
+
+        # Calcular porcentaje y determinar el resultado
+        if puntaje_maximo > 0:
+            porcentaje = (puntaje_total / puntaje_maximo) * 100
         else:
-            resultado = "NO ACEPTADO"
+            porcentaje = 0
+
+        resultado = "ACEPTADO" if porcentaje >= 75 else "NO ACEPTADO"
+
         auditorias_con_puntaje.append({
             'auditoria': auditoria,
             'puntaje_total': puntaje_total,
             'resultado': resultado
         })
-    return render(request, 'questions/lista_auditorias.html', {'auditorias': auditorias_con_puntaje})   
+
+    return render(request, 'questions/lista_auditorias.html', {'auditorias': auditorias_con_puntaje})
+
 
 @login_required
 def eliminar_auditoria(request, auditoria_id):
     auditoria = get_object_or_404(Auditoria, id=auditoria_id)
-    
+
     if request.method == 'POST':
         auditoria.delete()
         messages.success(request, 'La auditoría ha sido eliminada exitosamente.')
-        return redirect('lista_auditorias') 
+        return redirect('lista_auditorias')
     return render(request, 'questions/confirmar_eliminacion.html', {'auditoria': auditoria})
 
 @login_required
@@ -138,10 +145,10 @@ def resultado_auditoria_pdf(request, auditoria_id):
     respuestas = Respuesta.objects.filter(auditoria=auditoria)
     resultados = Respuesta.calcular_resultados(auditoria)
     puntaje_total = sum(respuesta.puntaje for respuesta in respuestas)
-    
+
     # Recuperar el comentario de la sesión
     comentario_general = request.session.get('comentario_general', '')
-    
+
     # Renderiza el template a un HTML
     html_string = render_to_string('questions/resultado_auditoria.html', {
         'auditoria': auditoria,
@@ -154,7 +161,7 @@ def resultado_auditoria_pdf(request, auditoria_id):
     # Genera el PDF
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="resultado_auditoria_{auditoria_id}.pdf"'
-    
+
     # Genera el PDF
     pdf = HTML(string=html_string).write_pdf()
     # Aquí puedes agregar el número de página si es necesario
@@ -163,8 +170,13 @@ def resultado_auditoria_pdf(request, auditoria_id):
     response.write(pdf)
     return response
 
+from django.http import JsonResponse
+from .models import PreguntaPredefinida
 
 def obtener_preguntas_por_checklist(request):
     checklist_id = request.GET.get('checklist_id')
+    print(f"ID del checklist recibido: {checklist_id}")
     preguntas = PreguntaPredefinida.objects.filter(checklist_id=checklist_id).values('id', 'texto')
-    return JsonResponse(list(preguntas), safe=False)
+    data = list(preguntas)
+    print(f"Cantidad de preguntas devueltas: {len(data)}")
+    return JsonResponse(data, safe=False)

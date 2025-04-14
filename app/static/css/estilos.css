@@ -1,193 +1,194 @@
 .roboto {
-    font-family: "Roboto", sans-serif;
-    font-optical-sizing: auto;
-    font-style: italic;
-    font-variation-settings:
-      "wdth" 100;
-  }
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-style: italic;
+  font-variation-settings:
+    "wdth" 100;
+}
 .navbar {
-  background-color: #f7e3a1;
+background-color: #f7e3a1;
 }
 body{
-  background-color: white
+background-color: white
 }
 .form-control {
-  height: 35px;
-  background-color: rgb(226, 225, 225);
-  font-size: 14px;
+height: 35px;
+background-color: rgb(226, 225, 225);
+font-size: 14px;
 }
 .form-select {
-  height: 35px;
-  background-color: rgb(226, 225, 225);
-  font-size: 14px;
+height: 35px;
+background-color: rgb(226, 225, 225);
+font-size: 14px;
 }
 label {
-  font-size: 13px;
+font-size: 13px;
 }
 .title_nva_auditoria {
-  font-size: 35px;
-  font-family: Arial, Helvetica, sans-serif;
-  color: rgb(242, 243, 242);
-  text-decoration: underline;
-  text-align: center;
-  margin-bottom: 20px;
+font-size: 35px;
+font-family: Arial, Helvetica, sans-serif;
+color: rgb(242, 243, 242);
+text-decoration: underline;
+text-align: center;
+margin-bottom: 20px;
 }
 .title_checklist {
-  font-size: 40px;
-  text-align: center;
-  color: antiquewhite;
-  font-family: Arial, Helvetica, sans-serif;
+font-size: 40px;
+text-align: center;
+color: antiquewhite;
+font-family: Arial, Helvetica, sans-serif;
 }
 .title_button {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+display: flex;
+flex-wrap: wrap;
+justify-content: space-between;
 }
 .cancelar{
-  color: beige;
+color: beige;
 }
 .item{
-  color: rgb(1, 20, 54);
-  font-size: 18px;
+color: rgb(1, 20, 54);
+font-size: 18px;
 }
 .button_nueva_auditoria {
-  color: antiquewhite;
-  width: 100%;
+color: antiquewhite;
+width: 100%;
 }
 .radio-container {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 10px;
+display: flex;
+justify-content: space-between;
+width: 100%;
+margin-top: 10px;
 }
 .radio-container label {
-  flex: 1;
-  text-align: center;
+flex: 1;
+text-align: center;
 }
 .custom-radio input[type="radio"] {
-  transform: scale(1.5);
-  margin-right: 5px;
-  cursor: pointer;
-  }
+transform: scale(1.5);
+margin-right: 5px;
+cursor: pointer;
+}
 table {
-  width: 100%;
+width: 100%;
 }
 .eliminar {
-  color: white;
+color: white;
 }
 thead tr th {
-  font-size: 15px;
-  font-weight: 400;
-  text-align: center;
+font-size: 15px;
+font-weight: 400;
+text-align: center;
 }
 tbody tr {
-  font-size: 12px;
-  margin-bottom: solid 2px black;
+font-size: 12px;
+margin-bottom: solid 2px black;
 }
 .table th, .table td {
-  border: 1px solid black; /* Cambia el grosor y el color según tus necesidades */
+border: 1px solid black; /* Cambia el grosor y el color según tus necesidades */
 }
 .card-body {
-  font-size: 13px;
-  text-align: justify;
+font-size: 13px;
+text-align: justify;
 }
 .titulo-listado {
-  font-size: 24px;
-  text-align: center;
-  color: #0e48e9;
-  text-decoration: underline;
-  margin-bottom: 15px;
+font-size: 24px;
+text-align: center;
+color: #0e48e9;
+text-decoration: underline;
+margin-bottom: 15px;
+margin-top: 15px;
 }
 .titulo-final-auditoria {
-  font-size: 28px;
-  text-align: center;
-  text-decoration: underline;
-  margin-bottom: 15px;
+font-size: 28px;
+text-align: center;
+text-decoration: underline;
+margin-bottom: 15px;
+margin-top:15px;
 }
 .dato {
-  font-size: 14px;
-  color: rgb(52, 53, 52);
-  font-weight: 600;
-  margin-left: 10px;
+font-size: 14px;
+color: rgb(52, 53, 52);
+font-weight: 600;
+margin-left: 10px;
 }
 .datos-auditoria {
-  font-size: 14px;
-  margin-bottom: 0;
-  padding-bottom: 0;
+font-size: 14px;
+margin-bottom: 0;
+padding-bottom: 0;
 }
 .leyenda-advertencia {
-  color: red;
-  font-size: 20px;
-  font-family: italic;
-  text-align: center;
+color: red;
+font-size: 20px;
+font-family: italic;
+text-align: center;
 }
 .resumen-resultado {
-  font-size: 25px;
-  text-align: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  color: grey;
+font-size: 25px;
+text-align: center;
+margin-top: 10px;
+margin-bottom: 10px;
+color: grey;
 }
 .resultados {
-  font-size: 14px;
-  margin-bottom: 0;
-  padding-bottom: 0;
+font-size: 14px;
+margin-bottom: 0;
+padding-bottom: 0;
 }
 .valores {
-  font-size: 15px;
-  margin-left: 5px;
-  color: blue;
-  font-weight: 400;
+font-size: 15px;
+margin-left: 5px;
+color: blue;
+font-weight: 400;
 }
 .resultado-final-bueno{
-  font-size: 17px;
-  color: green;
-  font-weight: 400;
-  text-decoration: underline;
-  /* margin-top: 25px; */
-  margin-bottom: 0px;
-  text-align: center;
+font-size: 17px;
+color: green;
+font-weight: 400;
+text-decoration: underline;
+/* margin-top: 25px; */
+margin-bottom: 0px;
+text-align: center;
 }
 .resultado-final-malo{
-  font-size: 17px;
-  color: red;
-  background-color: rgb(248, 248, 114);
-  font-weight: 400;
-  text-decoration: underline;
-  margin-top: 2px;
-  text-align: center;
+font-size: 17px;
+color: red;
+font-weight: 400;
+text-decoration: underline;
+margin-top: 2px;
+text-align: center;
 }
 .texto-critico {
-  color: red;
+color: red;
 }
 .custom-container {
-  max-width: 1300px;
-  margin: 0 auto;
+max-width: 1300px;
+margin: 0 auto;
 }
 .observaciones {
-  display: none;
-  margin-top: 10px;
+display: none;
+margin-top: 10px;
 }
 .cuadro-resultados {
-  text-align: center;
-  margin: auto;
-  margin-bottom: 5px;
+text-align: center;
+margin: auto;
+margin-bottom: 5px;
 }
 .comentario-general {
-  font-size: 11pt;
-  font-style: italic;
+font-size: 11pt;
+font-style: italic;
 }
 .comentario-general-label {
-  font-size: 10pt;
-  margin-left: 5px;
+font-size: 10pt;
+margin-left: 5px;
 }
 input[type="radio"]:disabled {
-  color: black; /* Cambia el color del texto del checkbox */
+color: black; /* Cambia el color del texto del checkbox */
 }
 input[type="radio"]:disabled + label {
-  color: black; /* Cambia el color del label asociado al checkbox */
-  opacity: 0.5; /* Opcional: para dar un efecto de deshabilitado */
+color: black; /* Cambia el color del label asociado al checkbox */
+opacity: 0.5; /* Opcional: para dar un efecto de deshabilitado */
 }
 .container-nueva {
-  width: 40%;
+width: 40%;
 }

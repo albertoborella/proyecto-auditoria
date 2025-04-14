@@ -4,7 +4,7 @@ from .models import Auditoria
 class AuditoriaForm(forms.ModelForm):
     class Meta:
         model = Auditoria
-        fields = ['fecha', 'cliente', 'auditor', 'auditores_acompanantes', 'checklist']  # 👈 Agregado 'checklist'
+        fields = ['fecha', 'cliente', 'auditor', 'auditores_acompanantes', 'lineas_auditadas', 'checklist']  # 👈 Agregado 'checklist'
         widgets = {
             'fecha': forms.DateInput(attrs={
                 'class': 'form-control',
@@ -18,6 +18,9 @@ class AuditoriaForm(forms.ModelForm):
                 'class': 'form-select',
             }),
             'auditores_acompanantes': forms.TextInput(attrs={
+                'class': 'form-control',
+            }),
+            'lineas_auditadas': forms.TextInput(attrs={
                 'class': 'form-control',
             }),
             'checklist': forms.Select(attrs={  # 👈 Nuevo widget para el campo checklist

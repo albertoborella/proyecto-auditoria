@@ -5,8 +5,8 @@ from .models import PreguntaPredefinida, Cliente, Auditor, Auditoria, Respuesta,
 class PreguntaPredefinidaAdmin(admin.ModelAdmin):
     list_display = ('numero_pregunta', 'texto', 'texto_critico', 'checklist')
     list_filter = ('checklist', 'texto_critico')
-    search_fields = ('texto',)
     ordering = ('checklist', 'numero_pregunta')
+    fields = ('numero_pregunta', 'texto', 'texto_critico', 'checklist')
 
 class ChecklistAdmin(admin.ModelAdmin):
     list_display = ('nombre',)

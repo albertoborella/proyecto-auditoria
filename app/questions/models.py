@@ -11,11 +11,10 @@ class PreguntaPredefinida(models.Model):
     texto = models.TextField()
     texto_critico = models.BooleanField(default=False)
     numero_pregunta = models.IntegerField(blank=True, null=True)
-    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE, related_name='preguntas')
-    
+    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE, null=True, blank=True)
+
     class Meta():
         ordering = ['numero_pregunta']
-
     def __str__(self):
         return self.texto
 
@@ -24,26 +23,26 @@ class Cliente(models.Model):
     nombre = models.CharField(max_length=255)
     def __str__(self):
         return self.nombre
-    
+
 
 class Auditor(models.Model):
     nombre = models.CharField(max_length=255)
 
     def __str__(self):
         return self.nombre
-    
+
 
 class Auditoria(models.Model):
     fecha = models.DateField()
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     auditor = models.ForeignKey(Auditor, on_delete=models.CASCADE)
     auditores_acompanantes = models.CharField(verbose_name='Auditores acompañantes',max_length=255, blank=True, null=True)
     lineas_auditadas = models.CharField(verbose_name='Lineas de producción auditadas',max_length=255, blank=True, null=True)
-    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE)
-    
+    checklist = models.ForeignKey(Checklist, on_delete=models.SET_NULL, null=True, blank=True)
+
     def __str__(self):
         return f"Auditoría de {self.cliente} realizada por {self.auditor} el {self.fecha}"
-     
+
 
 class Respuesta(models.Model):
     OPCIONES_RESPUESTA = [
@@ -52,12 +51,12 @@ class Respuesta(models.Model):
         ('no_correcto', 'No Correcto'),
         ('critica', 'Critica'),
     ]
-    pregunta_predefinida = models.ForeignKey(PreguntaPredefinida, on_delete=models.CASCADE)
+    pregunta_predefinida = models.ForeignKey(PreguntaPredefinida, on_delete=models.CASCADE, default='correcto')
     auditoria = models.ForeignKey(Auditoria, on_delete=models.CASCADE)
     tipo_respuesta = models.CharField(max_length=21, choices=OPCIONES_RESPUESTA)
     puntaje = models.IntegerField()
     observaciones = models.TextField(blank=True, null=True)
-    
+
 
     def save(self, *args, **kwargs):
         if self.tipo_respuesta == 'correcto':
@@ -73,7 +72,7 @@ class Respuesta(models.Model):
         super().save(*args, **kwargs)
     def __str__(self):
         return f"{self.pregunta_predefinida} - {self.get_tipo_respuesta_display()}"
-    
+
     @classmethod
     def calcular_resultados(cls, auditoria):
         # Filtrar respuestas por auditoría

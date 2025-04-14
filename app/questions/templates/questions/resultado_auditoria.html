@@ -1,8 +1,9 @@
 {% extends 'questions/base.html' %}
+{% load static %}
 {% block content %}
 <style>
     @page {
-        size: A4 landscape; 
+        size: A4 landscape;
         margin: 20mm;
     }
     @page {
@@ -15,7 +16,7 @@
             display: none; /* Oculta los botones y navbar al imprimir */
         }
         .container {
-            width: 100%; 
+            width: 100%;
         }
     }
     tbody tr {
@@ -40,7 +41,7 @@
     }
     .valores {
         font-size: 14px;
-        margin-left: 5px; 
+        margin-left: 5px;
         font-weight: 500;
         font-family: Arial;
     }
@@ -91,7 +92,7 @@
                 <th style="border: 2px solid black;">Pregunta</th>
                 <th style="border: 2px solid black;">Respuesta</th>
                 <th style="border: 2px solid black;">Puntaje</th>
-                <th style="border: 2px solid black;">Observaciones</th> 
+                <th style="border: 2px solid black;">Observaciones</th>
             </tr>
         </thead>
         <tbody>
@@ -117,12 +118,13 @@
             <p class="resultados">Porcentaje mínimo de aprobación:<span class="valores">75%</span></p>
             <p class="resultados">Porcentaje alcanzado:<span class="valores">{{ resultados.porcentaje_obtenido }}%</span></p>
             {% if resultados.porcentaje_obtenido >= 75 %}
-            <h3 class="resultado-final-bueno">"ACEPTADO"</h3>
+                <h3 class="resultado-final-bueno">"ACEPTADO"</h3>
             {% else %}
-            <h3 class="resultado-final-malo">"NO ACEPTADO"</h3>
-            {% endif %}
+                <h3 class="resultado-final-malo">"NO ACEPTADO"</h3>
             {% if resultados.cantidad_criticas %}
-            <h3 class="resultado-final-malo">"NO CONFORMIDAD CRÍTICA"</h3>
+                <h3 class="resultado-final-malo">"NO CONFORMIDAD CRÍTICA"</h3>
+            {% endif %}
+                <p style="color: black; font-weight: 700; font-size: 22px;">Se suspende lo normado en el artículo 1 de la Resolución 1256/98 SENASA, hasta realizar una nueva auditoría</p>
             {% endif %}
         </div>
     </div>
@@ -144,14 +146,17 @@
         <div style="border-top: 1px solid black; width: 40%; margin: 0 auto;"></div>
         <p style="font-size: 12px; margin-bottom: 0px; padding-bottom: 0px;">Firma Auditor Líder</p>
     </div>
+    </br>
     <div class="col-md-4 text-center" style="margin-top: 50px;">
         <div style="border-top: 1px solid black; width: 40%; margin: 0 auto;"></div>
         <p style="font-size: 12px; margin-bottom: 0px; padding-bottom: 0px;">Firma Auditores Acompañantes</p>
     </div>
+    </br>
     <div class="col-md-4 text-center" style="margin-top: 50px;">
         <div style="border-top: 1px solid black; width: 40%; margin: 0 auto;"></div>
         <p style="font-size: 12px; margin-bottom: 0px; padding-bottom: 0px;">Firma Responsable de la Empresa</p>
     </div>
+    </br>
 </div>
 </div>
 <br><br>
