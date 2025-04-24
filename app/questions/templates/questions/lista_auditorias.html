@@ -1,35 +1,142 @@
 {% extends 'questions/base.html' %}
 {% load static %}
 {% block content %}
-<div class="container">
-    <h1 class="titulo-listado">Lista de Auditorías</h1>
-    <table class="table table-sm" style="width: 100%;">
-        <thead>
-            <tr class="table-primary">
-                <th>Fecha de Auditoría</th>
-                <th>Cliente</th>
-                <th>Auditor</th>
-                <th>Puntaje</th>
-                <th>Resultado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in auditorias %}
-            <tr class="table-active">
-                <td>{{ item.auditoria.fecha }}</td>
-                <td>{{ item.auditoria.cliente }}</td>
-                <td>{{ item.auditoria.auditor }}</td>
-                <td>{{ item.puntaje_total }}</td>
-                <td>{{ item.resultado }}</td>
-                <td>
-                    <button class="btn btn-sm btn-danger">
-                        <a class="eliminar" href="{% url 'eliminar_auditoria' item.auditoria.id %}">Eliminar</a>
-                    </button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="container py-4">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <h2 class="mb-0" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
+                Lista de Auditorías
+            </h2>
+        
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <form method="get" class="d-flex gap-2 align-items-center">
+                    <select name="filtro" class="form-select form-select-sm">
+                        <option value="">Filtrar por...</option>
+                        <option value="cliente" {% if filtro_seleccionado == 'cliente' %}selected{% endif %}>Cliente</option>
+                        <option value="checklist" {% if filtro_seleccionado == 'checklist' %}selected{% endif %}>Checklist</option>
+                    </select>
+        
+                    {% if filtro_seleccionado == 'cliente' %}
+                        <select name="valor" class="form-select form-select-sm">
+                            <option value="">Selecciona un cliente</option>
+                            {% for cliente in clientes %}
+                                <option value="{{ cliente }}" {% if cliente == valor_seleccionado %}selected{% endif %}>
+                                    {{ cliente }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% elif filtro_seleccionado == 'checklist' %}
+                        <select name="valor" class="form-select form-select-sm">
+                            <option value="">Selecciona un checklist</option>
+                            {% for tipo in tipos_checklist %}
+                                <option value="{{ tipo }}" {% if tipo == valor_seleccionado %}selected{% endif %}>
+                                    {{ tipo }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+        
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Aplicar</button>
+                    <a href="{% url 'lista_auditorias' %}" class="btn btn-outline-secondary btn-sm">Reset</a>
+                </form>
+        
+                <a href="{% url 'nueva_auditoria' %}" class="btn btn-primary btn-sm">
+                    + Nueva Auditoría
+                </a>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center align-middle table-sm small">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Auditor</th>
+                        <th>Checklist</th>
+                        <th>Puntaje</th>
+                        <th>Resultado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in auditorias %}
+                        <td>{{ item.numero_descendente }}</td>
+                        <td>{{ item.auditoria.fecha }}</td>
+                        <td>{{ item.auditoria.cliente }}</td>
+                        <td>{{ item.auditoria.auditor }}</td>
+                        <td>{{ item.auditoria.checklist }}</td>
+                        <td>{{ item.puntaje_total }}</td>
+                        <td>
+                            {% if item.resultado == "ACEPTADO" %}
+                                <span style="font-size: 12px; color: green;">
+                                    <i class="bi bi-check-circle-fill me-1"></i> ACEPTADO
+                                </span>
+                            {% elif item.resultado == "NO ACEPTADO" %}
+                                <span style="font-size: 12px; color: red;">
+                                    <i class="bi bi-x-circle-fill me-1"></i> NO ACEPTADO
+                                </span>
+                            {% else %}
+                                <span style="font-size: 12px; color: blue;">
+                                    <i class="bi bi-x-circle-fill me-1"></i> INFORME DEL AUDITOR
+                                </span>
+                            {% endif %}
+                        </td>
+                        
+                        
+                        <td class="text-nowrap">
+                            <a href="{% url 'eliminar_auditoria' item.auditoria.id %}" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                            {% if item.auditoria.resultado_pdf %}
+                            <a href="{{ item.auditoria.resultado_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-success" title="Ver PDF">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <nav aria-label="Paginación">
+            <ul class="pagination justify-content-center mt-4">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                        &laquo;
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                        &raquo;
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    </div>
 </div>
 {% endblock %}
+

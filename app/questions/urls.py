@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home, crear_auditoria, checklist_auditoria, resultado_auditoria, lista_auditorias, eliminar_auditoria, resultado_auditoria_pdf, obtener_preguntas_por_checklist
+from .views import home, crear_auditoria, checklist_auditoria, resultado_auditoria,lista_auditorias, eliminar_auditoria, resultado_auditoria_pdf, obtener_preguntas_por_checklist, modulo_construccion
 
 urlpatterns = [
     path('', home, name='home' ),
@@ -10,4 +10,5 @@ urlpatterns = [
     path('auditorias/eliminar/<int:auditoria_id>/', eliminar_auditoria, name='eliminar_auditoria'),
     path('auditorias/pdf/<int:auditoria_id>/', resultado_auditoria_pdf, name='resultado_auditoria_pdf'),
     path('ajax/preguntas/', obtener_preguntas_por_checklist, name='ajax_preguntas_checklist'),
+    path('construccion/', modulo_construccion, name='construccion'),
 ]

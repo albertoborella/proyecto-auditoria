@@ -13,3 +13,20 @@ def get_item(respuestas, pregunta_id):
 @register.filter
 def filter_respuestas(respuestas, pregunta_id):
     return respuestas.filter(pregunta_predefinida__id=pregunta_id)
+
+
+@register.filter
+def get_respuesta(respuestas, pregunta):
+    respuesta = respuestas.filter(pregunta_predefinida=pregunta).first()
+    return respuesta.tipo_respuesta if respuesta else ''
+
+@register.filter
+def get_observaciones(auditoria, pregunta_id):
+    """
+    Obtiene las observaciones de la respuesta para una pregunta específica en una auditoría.
+    """
+    try:
+        respuesta = Respuesta.objects.get(auditoria=auditoria, pregunta_predefinida_id=pregunta_id)
+        return respuesta.observaciones
+    except Respuesta.DoesNotExist:
+        return None

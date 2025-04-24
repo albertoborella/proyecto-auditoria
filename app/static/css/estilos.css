@@ -192,3 +192,10 @@ opacity: 0.5; /* Opcional: para dar un efecto de deshabilitado */
 .container-nueva {
 width: 40%;
 }
+.rounded-circle {
+  border: 3px solid white;
+  transition: transform 0.3s ease;
+}
+.rounded-circle:hover {
+  transform: scale(1.05);
+}

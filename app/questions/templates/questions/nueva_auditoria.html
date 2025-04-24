@@ -1,30 +1,60 @@
 {% extends 'questions/base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 {% block content %}
-<div class="container-sm mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="titulo-listado">Nueva auditoría</h1>
-        <a href="{% url 'home' %}" class="btn btn-sm btn-secondary">Cancelar</a>
+<div class="position-relative" style="width: 100%; height: 50vh; overflow: hidden;">
+    <img src="{% static 'img/registro-auditoria.png' %}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="Banner Auditoría">
+    <div class="position-absolute top-50 start-50 translate-middle text-white text-center">
+        <h1 style="
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+            letter-spacing: 1px;
+            padding-top: 40px;
+        ">
+            REGISTRO AUDITORIA
+        </h1>
     </div>
-    <form method="post" class="w-100">
-        {% csrf_token %}
-        <div class="row">
-            {% for field in form %}
-            <div class="mb-3 col-md-6">
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                <div class="text-danger">{{ field.errors }}</div>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-        <div id="mensaje-preguntas" class="alert alert-info mt-3" role="alert">
-            ℹ️ Seleccione un checklist para ver cuántas preguntas contiene.
-        </div>
-        <button id="btn-crear" type="submit" class="btn btn-primary mt-2" disabled>Crear Auditoría</button>
-    </form>
 </div>
+
+<div class="container mt-4" style="max-width: 720px;">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0" style="font-family: 'Montserrat', sans-serif;">Nueva Auditoría</h2>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">Cancelar</a>
+        </div>
+
+        <form method="post" class="w-100">
+            {% csrf_token %}
+            <div class="row g-3">
+                {% for field in form %}
+                <div class="col-md-6">
+                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold" style="font-size: 0.9rem;">
+                        {{ field.label }}
+                    </label>
+                    {{ field|add_class:"form-control form-control-sm" }}
+                    {% if field.errors %}
+                    <div class="form-text text-danger">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div id="mensaje-preguntas" class="alert alert-info mt-4" role="alert">
+                ℹ️ Seleccione un checklist para ver cuántas preguntas contiene.
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button id="btn-crear" type="submit" class="btn btn-primary btn-sm px-4 mt-2" disabled>
+                    Crear Auditoría
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}

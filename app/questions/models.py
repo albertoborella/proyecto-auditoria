@@ -3,6 +3,7 @@ from django.db.models import Sum, Count
 
 class Checklist(models.Model):
     nombre = models.CharField(max_length=100)
+    usa_puntaje = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nombre
@@ -10,7 +11,7 @@ class Checklist(models.Model):
 class PreguntaPredefinida(models.Model):
     texto = models.TextField()
     texto_critico = models.BooleanField(default=False)
-    numero_pregunta = models.IntegerField(blank=True, null=True)
+    numero_pregunta = models.CharField(max_length=5, blank=True, null=True)
     checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta():
@@ -39,6 +40,10 @@ class Auditoria(models.Model):
     auditores_acompanantes = models.CharField(verbose_name='Auditores acompañantes',max_length=255, blank=True, null=True)
     lineas_auditadas = models.CharField(verbose_name='Lineas de producción auditadas',max_length=255, blank=True, null=True)
     checklist = models.ForeignKey(Checklist, on_delete=models.SET_NULL, null=True, blank=True)
+    resultado_pdf = models.FileField(upload_to='auditorias/', null=True, blank=True)
+
+    class Meta:
+        ordering = ['-fecha']
 
     def __str__(self):
         return f"Auditoría de {self.cliente} realizada por {self.auditor} el {self.fecha}"
@@ -73,48 +78,60 @@ class Respuesta(models.Model):
     def __str__(self):
         return f"{self.pregunta_predefinida} - {self.get_tipo_respuesta_display()}"
 
-    @classmethod
-    def calcular_resultados(cls, auditoria):
-        # Filtrar respuestas por auditoría
-        respuestas = cls.objects.filter(auditoria=auditoria)
-        # Contar respuestas correctas, parcialmente correctas y no correctas
+    @staticmethod
+    def calcular_resultados(auditoria):
+        checklist = auditoria.checklist
+        respuestas = Respuesta.objects.filter(auditoria=auditoria)
+
+        if not respuestas.exists():
+            return {
+                'modo_sin_puntaje': not checklist.usa_puntaje,
+                'cantidad_correctas': 0,
+                'cantidad_parciales': 0,
+                'cantidad_no_correctas': 0,
+                'cantidad_criticas': 0,
+                'puntaje_correcto': 0,
+                'puntaje_parcial': 0,
+                'puntaje_no_correcto': 0,
+                'puntaje_critico': 0,
+                'puntaje_maximo': 0,
+                'puntaje_obtenido': 0,
+                'resultado_aceptable': False,
+                'porcentaje_obtenido': 0,
+            }
+
         correctas = respuestas.filter(tipo_respuesta='correcto')
         parciales = respuestas.filter(tipo_respuesta='parcialmente_correcto')
         no_correctas = respuestas.filter(tipo_respuesta='no_correcto')
         criticas = respuestas.filter(tipo_respuesta='critica')
-        # Sumar puntajes
-        puntaje_correcto = correctas.aggregate(Sum('puntaje'))['puntaje__sum'] or 0
-        puntaje_parcial = parciales.aggregate(Sum('puntaje'))['puntaje__sum'] or 0
-        puntaje_no_correcto = no_correctas.aggregate(Sum('puntaje'))['puntaje__sum'] or 0
-        puntaje_critico = criticas.aggregate(Sum('puntaje'))['puntaje__sum'] or 0
-        # Calcular cantidad de respuestas
-        cantidad_correctas = correctas.count()
-        cantidad_parciales = parciales.count()
-        cantidad_no_correctas = no_correctas.count()
-        cantidad_criticas = criticas.count()
-        print(cantidad_criticas)
-        # Calcular puntaje máximo
-        puntaje_maximo = respuestas.count()  # Total de preguntas
-        # Calcular puntaje obtenido
-        puntaje_obtenido = puntaje_maximo + puntaje_parcial + puntaje_no_correcto + puntaje_critico
-        # Determinar si el resultado es aceptable
-        resultado_aceptable = puntaje_obtenido >= (0.75 * puntaje_maximo)
-        # Porcentaje obtenido
-        porcentaje_obtenido = (puntaje_obtenido / puntaje_maximo * 100) if puntaje_maximo > 0 else 0
-        porcentaje_obtenido = round(porcentaje_obtenido, 2)  # Redondear a 2 decimales
-        # Devolver resultados
+
+        puntaje_correcto = correctas.aggregate(total=Sum('puntaje'))['total'] or 0
+        puntaje_parcial = parciales.aggregate(total=Sum('puntaje'))['total'] or 0
+        puntaje_no_correcto = no_correctas.aggregate(total=Sum('puntaje'))['total'] or 0
+        puntaje_critico = criticas.aggregate(total=Sum('puntaje'))['total'] or 0
+
+        puntaje_maximo = respuestas.count()  # Cada respuesta correcta suma 1
+        puntaje_obtenido = puntaje_correcto + puntaje_parcial + puntaje_no_correcto + puntaje_critico
+        porcentaje_obtenido = (puntaje_obtenido / puntaje_maximo) * 100 if puntaje_maximo > 0 else 0
+
         return {
-            'cantidad_correctas': cantidad_correctas,
+            'modo_sin_puntaje': not checklist.usa_puntaje,
+            'cantidad_correctas': correctas.count(),
+            'cantidad_parciales': parciales.count(),
+            'cantidad_no_correctas': no_correctas.count(),
+            'cantidad_criticas': criticas.count(),
             'puntaje_correcto': puntaje_correcto,
-            'cantidad_parciales': cantidad_parciales,
-            'cantidad_criticas': cantidad_criticas,
             'puntaje_parcial': puntaje_parcial,
-            'puntaje_critico': puntaje_critico,
-            'cantidad_no_correctas': cantidad_no_correctas,
             'puntaje_no_correcto': puntaje_no_correcto,
+            'puntaje_critico': puntaje_critico,
             'puntaje_maximo': puntaje_maximo,
             'puntaje_obtenido': puntaje_obtenido,
-            'resultado_aceptable': resultado_aceptable,
-            'porcentaje_obtenido': porcentaje_obtenido
+            'resultado_aceptable': porcentaje_obtenido >= 75,
+            'porcentaje_obtenido': round(porcentaje_obtenido, 2),
         }
+
+
+
+
+
 

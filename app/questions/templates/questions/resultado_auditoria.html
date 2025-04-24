@@ -1,163 +1,202 @@
 {% extends 'questions/base.html' %}
 {% load static %}
+{% load custom_filters %}
+
 {% block content %}
 <style>
-    @page {
-        size: A4 landscape;
-        margin: 20mm;
-    }
-    @page {
+  @page {
+      size: A4 landscape;
+      margin: 20mm;
+  }
+  @page {
+      @bottom-center {
+          content: "Página " counter(page) " de " counter(pages);
+      }
+  }
+  @page {
+        size: A4;
+        margin: 2cm;
         @bottom-center {
             content: "Página " counter(page) " de " counter(pages);
+            font-size: 10px;
+            color: #666;
         }
     }
-    @media print {
-        header, .navbar, .btn {
-            display: none; /* Oculta los botones y navbar al imprimir */
-        }
-        .container {
-            width: 100%;
-        }
-    }
-    tbody tr {
-        font-size: 9pt;
-    }
-    .resultados {
-        font-size: 12px;
-        font-family: Arial;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-    .titulo-listado {
-        font-size: 24px;
-        text-align: center;
-        margin-bottom: 15px;
-    }
-    .titulo-final-auditoria {
-        font-size: 28px;
-        font-family: Arial;
-        text-decoration: underline;
-        margin-bottom: 15px;
-    }
-    .valores {
-        font-size: 14px;
-        margin-left: 5px;
-        font-weight: 500;
-        font-family: Arial;
-    }
-    .page-number {
-        font-size: 10px;
-        position: fixed;
-        bottom: 10px;
-        right: 10px;
-    }
-    .resultado-final-bueno {
-        font-size: 20px;
-        font-weight: 800;
-        text-decoration: underline;
-        margin-top: 5px;
-        text-align: center;
-    }
-    .resultado-final-malo {
-        font-size: 20px;
-        font-weight: 800;
-        text-decoration: underline;
-        margin-top: 5px;
-        text-align: center;
-    }
-    .comentario-general {
-        font-size: 11pt;
-        font-style: italic;
-        height: 100px;
-    }
-    .comentario-general-label {
-        font-size: 10pt;
-    }
-    textarea {
-        width: 100%;
-    }
+  @media print {
+      header, .navbar, .btn {
+          display: none; /* Oculta los botones y navbar al imprimir */
+      }
+      .container {
+          width: 100%;
+      }
+  }
+  tbody tr {
+      font-size: 10pt;
+      color:black;
+  }
+  .info-puntajes {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    margin: 1px;
+    padding: 2px;
+  }
+  .resultados {
+      font-size: 12px;
+      font-family: Arial;
+      margin-bottom: 0;
+      padding-bottom: 0;
+  }
+  /* .titulo-listado {
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 15px;
+  } */
+  /* .titulo-final-auditoria {
+      font-size: 28px;
+      font-family: Arial;
+      text-decoration: underline;
+      margin-bottom: 15px;
+  } */
+  .valores {
+      font-size: 14px;
+      margin-left: 5px;
+      font-weight: 500;
+      font-family: Arial;
+      color:black
+  }
+  .page-number {
+      font-size: 10px;
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+  }
+  .resultado-final-bueno {
+      font-size: 20px;
+      font-weight: 800;
+      text-decoration: underline;
+      margin-top: 5px;
+      text-align: center;
+  }
+  .resultado-final-malo {
+      font-size: 20px;
+      font-weight: 800;
+      text-decoration: underline;
+      margin-top: 5px;
+      text-align: center;
+  }
+  .comentario-general {
+      font-size: 11pt;
+      font-style: italic;
+      height: 100px;
+  }
+  .comentario-general-label {
+      font-size: 10pt;
+  }
+  .informacion_auditoria {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12pt;
+    margin: 1px;
+    padding: 2px;
+    color:#0f0f0f;
+  }
+  textarea {
+      width: 100%;
+  }
 </style>
-<div class="container custom-container">
-    <h1 class="titulo-final-auditoria">Resultado de la Auditoría a {{auditoria.cliente}}</h1>
-    <p class="resultados">Fecha: <span class="dato">{{ auditoria.fecha }}</span></p>
-    <p class="resultados">Cliente: <span class="dato">{{ auditoria.cliente }}</span></p>
-    <p class="resultados">Líneas de Producción Auditadas: <span class="dato">{{ auditoria.lineas_auditadas }}</span></p>
-    <p class="resultados">Auditor líder: <span class="dato">{{ auditoria.auditor }}</span></p>
-    <p class="resultados">Auditores acompañantes: <span class="dato">{{ auditoria.auditores_acompanantes }}</span></p>
-    <hr>
-    <h3 class="titulo-listado">Detalles de las Preguntas y Puntajes</h3>
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th style="border: 2px solid black;">Pregunta</th>
-                <th style="border: 2px solid black;">Respuesta</th>
-                <th style="border: 2px solid black;">Puntaje</th>
-                <th style="border: 2px solid black;">Observaciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for respuesta in respuestas %}
-            <tr>
-                <td style="border: 1px solid black;" class="{% if respuesta.pregunta_predefinida.texto_critico %} texto-critico {% endif %}">
-                    {{ respuesta.pregunta_predefinida }}
-                </td>
-                <td style="border: 1px solid black;">{{ respuesta.get_tipo_respuesta_display }}</td>
-                <td style="border: 1px solid black;">{{ respuesta.puntaje }}</td>
-                <td style="border: 1px solid black;">{{ respuesta.observaciones }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <hr>
+<div class="container mt-2">
+  <h2 class="mb-2">Resultados de Auditoría {{ auditoria.nombre }}</h2>
+  <div class="card mt-2 mb-4 p-3 shadow-sm border rounded bg-light">
     <div class="row">
-    <div class="row col-md-6 cuadro-resultados">
-        <div>
-            <p style="font-size: 24px; color: rgb(58, 57, 57); text-decoration: underline;">Puntaje y Resultado</p>
-            <p class="resultados">Puntaje máximo:<span class="valores">{{ resultados.puntaje_maximo }}</span></p>
-            <p class="resultados">Puntaje obtenido:<span class="valores">{{ resultados.puntaje_obtenido }}</span></p>
-            <p class="resultados">Porcentaje mínimo de aprobación:<span class="valores">75%</span></p>
-            <p class="resultados">Porcentaje alcanzado:<span class="valores">{{ resultados.porcentaje_obtenido }}%</span></p>
-            {% if resultados.porcentaje_obtenido >= 75 %}
-                <h3 class="resultado-final-bueno">"ACEPTADO"</h3>
-            {% else %}
-                <h3 class="resultado-final-malo">"NO ACEPTADO"</h3>
-            {% if resultados.cantidad_criticas %}
-                <h3 class="resultado-final-malo">"NO CONFORMIDAD CRÍTICA"</h3>
-            {% endif %}
-                <p style="color: black; font-weight: 700; font-size: 22px;">Se suspende lo normado en el artículo 1 de la Resolución 1256/98 SENASA, hasta realizar una nueva auditoría</p>
-            {% endif %}
+        <div class="col-md-5">
+            <p class="informacion_auditoria"><strong>Fecha:</strong> {{ auditoria.fecha }}</p>
+            <p class="informacion_auditoria"><strong>Cliente:</strong> {{ auditoria.cliente }}</p>
+            <p class="informacion_auditoria"><strong>Checklist:</strong> {{ auditoria.checklist.nombre }}</p>
+        </div>
+        <div class="col-md-7">
+            <p class="informacion_auditoria"><strong>Auditor Responsable:</strong> {{ auditoria.auditor }}</p>
+            <p class="informacion_auditoria"><strong>Auditores Acompañantes:</strong> {{ auditoria.auditores_acompanantes }}</p>
+            <p class="informacion_auditoria"><strong>Puntaje: </strong><span class="info-puntajes">Correcto: 1 punto / Parcialmente Correcto: -2 puntos / No Correcto: -3 puntos</span></p>
         </div>
     </div>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    {% if resultados.modo_sin_puntaje %}
+      <p><strong>Este checklist no utiliza puntajes.</strong></p>
+    {% endif %}
+    <table class="table table-bordered">
+      <thead class="thead-dark">
+        <tr>
+          <th>Pregunta</th>
+          <th>Respuesta</th>
+          <th>Observaciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pregunta in preguntas %}
+          <tr>
+            <td><strong>{{ pregunta.numero_pregunta }}</strong> - {{ pregunta.texto }}</td>
+            <td>
+              <select name="pregunta_{{ pregunta.id }}" class="form-control">
+                <option value="">Seleccione una opción</option>
+                <option value="correcto" {% if respuestas|get_respuesta:pregunta == 'correcto' %}selected{% endif %}>Correcta</option>
+                <option value="parcialmente_correcto" {% if respuestas|get_respuesta:pregunta == 'parcialmente_correcto' %}selected{% endif %}>Parcialmente correcta</option>
+                <option value="no_correcto" {% if respuestas|get_respuesta:pregunta == 'no_correcto' %}selected{% endif %}>No correcta</option>
+                <option value="critica" {% if respuestas|get_respuesta:pregunta == 'critica' %}selected{% endif %}>Crítica</option>
+              </select>
+            </td>
+            <td>
+              <!-- Mostrar observaciones si existen -->
+              <p>Observaciones: {{ auditoria|get_observaciones:pregunta.id }}</p>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="comentario_general"><strong>Comentario general del auditor:</strong></label>
+      <textarea name="comentario_general" id="comentario_general" rows="4" class="form-control"></textarea>
     </div>
-    <br>
-    <div class="row col-md-6">
-        <form id="auditoriaForm" method="post">
-            {% csrf_token %}
-            <label class="comentario-general-label">Comentario general de la auditoría</label>
-            <textarea class="comentario-general" id="comentario_general" name="comentario_general" rows="4" cols="55" placeholder="Comentario general de la auditoría"">
-                {{ comentario_general }}
-            </textarea>
-            <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 50%;">Enviar y Generar PDF</button>
-        </form>
+    <button type="submit" class="btn btn-primary" style="margin-top: 5px;">Guardar y generar informe</button>
+  </form>
+  <hr>
+  <h4>Resumen</h4>
+  {% if resultados.modo_sin_puntaje %}
+    <ul>
+      <li>Correctas: {{ resultados.cantidad_correctas }}</li>
+      <li>Parcialmente correctas: {{ resultados.cantidad_parciales }}</li>
+      <li>No correctas: {{ resultados.cantidad_no_correctas }}</li>
+      <li>Críticas: {{ resultados.cantidad_criticas }}</li>
+    </ul>
+  {% else %}
+    <ul>
+      <li class="valores">Puntaje por respuestas correctas: {{ resultados.puntaje_correcto }}</li>
+      <li class="valores">Puntaje por respuestas parciales: {{ resultados.puntaje_parcial }}</li>
+      <li class="valores">Puntaje por respuestas no correctas: {{ resultados.puntaje_no_correcto }}</li>
+      <li class="valores">Puntaje máximo posible: {{ resultados.puntaje_maximo }}</li>
+      <li class="valores">Puntaje obtenido: {{ resultados.puntaje_obtenido }}</li>
+      <li style="text-align: center;list-style: none;">Porcentaje: <span style="font-weight: 800;">{{ resultados.porcentaje_obtenido }}%</span></li>
+      <li style="text-align: center;list-style: none;">
+        <p>Resultado</p>
+        <p class="resultados">Puntaje máximo:<span class="valores">{{ resultados.puntaje_maximo }}</span></p>
+        <p class="resultados">Puntaje obtenido:<span class="valores">{{ resultados.puntaje_obtenido }}</span></p>
+        <p class="resultados">Porcentaje mínimo de aprobación:<span class="valores">75%</span></p>
+        <p class="resultados">Porcentaje alcanzado:<span class="valores">{{ resultados.porcentaje_obtenido }}%</span></p>
+        {% if resultados.porcentaje_obtenido >= 75 %}
+            <h3 class="resultado-final-bueno">"ACEPTADO"</h3>
+        {% else %}
+            <h3 class="resultado-final-malo">"NO ACEPTADO"</h3>
+        {% if resultados.cantidad_criticas %}
+            <h3 class="resultado-final-malo">"NO CONFORMIDAD CRÍTICA"</h3>
+        {% endif %}
+            <p style="color: black; font-weight: 700; font-size: 22px;">Se suspende lo normado en el artículo 1 de la Resolución 1256/98 SENASA, hasta realizar una nueva auditoría</p>
+        {% endif %}
     </div>
-<br><br>
-<div class="row col-md-12">
-    <div class="col-md-4 text-center" style="margin-top: 50px;">
-        <div style="border-top: 1px solid black; width: 40%; margin: 0 auto;"></div>
-        <p style="font-size: 12px; margin-bottom: 0px; padding-bottom: 0px;">Firma Auditor Líder</p>
-    </div>
-    </br>
-    <div class="col-md-4 text-center" style="margin-top: 50px;">
-        <div style="border-top: 1px solid black; width: 40%; margin: 0 auto;"></div>
-        <p style="font-size: 12px; margin-bottom: 0px; padding-bottom: 0px;">Firma Auditores Acompañantes</p>
-    </div>
-    </br>
-    <div class="col-md-4 text-center" style="margin-top: 50px;">
-        <div style="border-top: 1px solid black; width: 40%; margin: 0 auto;"></div>
-        <p style="font-size: 12px; margin-bottom: 0px; padding-bottom: 0px;">Firma Responsable de la Empresa</p>
-    </div>
-    </br>
+      </li>
+    </ul>
+  {% endif %}
 </div>
-</div>
-<br><br>
 {% endblock %}
+
+
+
