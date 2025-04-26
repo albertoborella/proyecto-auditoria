@@ -129,9 +129,20 @@ class Respuesta(models.Model):
             'resultado_aceptable': porcentaje_obtenido >= 75,
             'porcentaje_obtenido': round(porcentaje_obtenido, 2),
         }
+    
+# models para referencias normativas y prerrequisitos
+class Ppr(models.Model):
+    numero = models.CharField(max_length=5)
+    requisito = models.TextField(blank=True, null=True)
+    estado = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.numero} - {self.requisito}"
 
 
+class Referencia(models.Model):
+    prr = models.ForeignKey(Ppr, related_name='referencias', on_delete=models.CASCADE)
+    texto = models.CharField(max_length=100)
 
-
-
-
+    def __str__(self):
+        return self.texto

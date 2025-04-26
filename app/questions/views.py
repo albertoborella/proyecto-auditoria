@@ -10,9 +10,10 @@ from django.core.paginator import Paginator
 from weasyprint import HTML
 import unicodedata
 import re
+from django.forms import modelformset_factory
 from django.utils.text import slugify
-from .forms import AuditoriaForm
-from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist 
+from .forms import AuditoriaForm, PprForm, ReferenciaFormSet
+from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist, Ppr, Referencia
 
 @login_required
 def home(request):
@@ -239,3 +240,71 @@ def obtener_preguntas_por_checklist(request):
 
 def modulo_construccion(request):
     return render(request,'questions/modulo_construccion.html')
+
+# views.py
+def crear_ppr(request):
+    if request.method == 'POST':
+        ppr_form = PprForm(request.POST)
+        formset = ReferenciaFormSet(request.POST, prefix='referencia_set')
+        if ppr_form.is_valid() and formset.is_valid():
+            ppr = ppr_form.save()
+            formset.instance = ppr
+            formset.save()
+            return redirect('lista_ppr')
+    else:
+        ppr_form = PprForm()
+        formset = ReferenciaFormSet(prefix='referencia_set')
+
+    return render(request, 'questions/crear_ppr.html', {
+        'ppr_form': ppr_form,
+        'formset': formset
+    })
+
+
+def lista_ppr(request):
+    pprs = Ppr.objects.prefetch_related('referencias').all()
+    return render(request, 'questions/lista_ppr.html', {'pprs': pprs})
+
+def editar_ppr(request, pk):
+    ppr = get_object_or_404(Ppr, pk=pk)
+
+    # Redefinimos el formset para edición con extra=0
+    ReferenciaFormSetEdit = modelformset_factory(
+        Referencia,
+        fields=('texto',),
+        extra=0,
+        can_delete=True
+    )
+
+    if request.method == 'POST':
+        ppr_form = PprForm(request.POST, instance=ppr)
+        formset = ReferenciaFormSetEdit(request.POST, queryset=ppr.referencias.all())
+
+        if ppr_form.is_valid() and formset.is_valid():
+            ppr_form.save()
+            instances = formset.save(commit=False)
+            for instance in instances:
+                instance.ppr = ppr
+                instance.save()
+            # Manejar eliminados
+            for deleted in formset.deleted_objects:
+                deleted.delete()
+            return redirect('lista_ppr')
+    else:
+        ppr_form = PprForm(instance=ppr)
+        formset = ReferenciaFormSetEdit(queryset=ppr.referencias.all())
+
+    return render(request, 'questions/crear_ppr.html', {
+        'ppr_form': ppr_form,
+        'formset': formset,
+        'editando': True,
+        'ppr': ppr
+    })
+
+def eliminar_ppr(request, pk):
+    ppr = get_object_or_404(Ppr, pk=pk)
+    if request.method == 'POST':
+        ppr.delete()
+        return redirect('lista_ppr')
+    return render(request, 'questions/confirmar_eliminar_ppr.html', {'ppr': ppr})
+

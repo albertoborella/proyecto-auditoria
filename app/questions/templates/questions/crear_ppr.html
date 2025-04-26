@@ -1,0 +1,111 @@
+{% extends 'questions/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="position-relative" style="width: 100%; height: 50vh; overflow: hidden;">
+    <img src="{% static 'img/registro-auditoria.png' %}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="Banner Prerrequisitos">
+    <div class="position-absolute top-50 start-50 translate-middle text-white text-center">
+        <h1 style="font-family: 'Montserrat', sans-serif; font-size: 2.8rem; font-weight: 600; color: white; text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7); letter-spacing: 1px;">
+            NUEVO PRERREQUISITO
+        </h1>
+    </div>
+</div>
+
+<div class="container mt-4" style="max-width: 720px;">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0" style="font-family: 'Montserrat', sans-serif;">Crear Prerrequisito</h2>
+            <a href="{% url 'lista_ppr' %}" class="btn btn-outline-secondary btn-sm">Cancelar</a>
+        </div>
+
+        <form method="post" class="w-100">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="{{ ppr_form.numero.id_for_label }}" class="form-label fw-semibold" style="font-size: 0.9rem;">
+                    {{ ppr_form.numero.label }}
+                </label>
+                {{ ppr_form.numero }}
+                {% if ppr_form.numero.errors %}
+                    <div class="form-text text-danger">{{ ppr_form.numero.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ ppr_form.requisito.id_for_label }}" class="form-label fw-semibold" style="font-size: 0.9rem;">
+                    {{ ppr_form.requisito.label }}
+                </label>
+                {{ ppr_form.requisito }}
+                {% if ppr_form.requisito.errors %}
+                    <div class="form-text text-danger">{{ ppr_form.requisito.errors }}</div>
+                {% endif %}
+            </div>
+
+            <h5 class="mt-4 mb-3">Referencias normativas</h5>
+            <div id="formset">
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    <div class="row mb-2 referencia-form">
+                        <div class="col-10">
+                            {{ form.texto }}
+                        </div>
+                        <div class="col-2 d-flex align-items-center">
+                          {% if forloop.first and not editando %}
+                          <button type="button" class="btn btn-outline-success btn-sm add-form">+</button>
+                          {% elif not forloop.first %}
+                          <button type="button" class="btn btn-outline-danger btn-sm remove-form">–</button>
+                          {% endif %}
+                      
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Este div oculto es la plantilla base para clonar -->
+            <div id="empty-form-template" class="d-none">
+                <div class="row mb-2 referencia-form">
+                    <div class="col-10">
+                        <input type="text" name="referencia_set-__prefix__-texto" class="form-control form-control-sm" placeholder="Ej: Codex Alimentarius" id="id_referencia_set-__prefix__-texto">
+                    </div>
+                    <div class="col-2 d-flex align-items-center">
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-form">–</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-primary btn-sm px-4">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const formsetDiv = document.getElementById('formset');
+    const totalFormsInput = document.getElementById('id_referencia_set-TOTAL_FORMS');
+    const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('add-form')) {
+            const formIndex = parseInt(totalFormsInput.value);
+            const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
+            formsetDiv.insertAdjacentHTML('beforeend', newFormHtml);
+            totalFormsInput.value = formIndex + 1;
+        }
+
+        if (e.target.classList.contains('remove-form')) {
+            const form = e.target.closest('.referencia-form');
+            if (form) form.remove();
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+
