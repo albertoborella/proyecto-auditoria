@@ -142,7 +142,7 @@ class Ppr(models.Model):
 
 class Referencia(models.Model):
     prr = models.ForeignKey(Ppr, related_name='referencias', on_delete=models.CASCADE)
-    texto = models.CharField(max_length=100)
+    texto = models.CharField(max_length=255)
 
     def __str__(self):
         return self.texto

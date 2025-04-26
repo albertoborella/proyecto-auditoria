@@ -262,8 +262,18 @@ def crear_ppr(request):
 
 
 def lista_ppr(request):
-    pprs = Ppr.objects.prefetch_related('referencias').all()
-    return render(request, 'questions/lista_ppr.html', {'pprs': pprs})
+    pprs = Ppr.objects.prefetch_related('referencias').all().order_by('numero')
+
+    paginator = Paginator(pprs, 5)  # 5 registros por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+    }
+
+    return render(request, 'questions/lista_ppr.html', context)
+
 
 def editar_ppr(request, pk):
     ppr = get_object_or_404(Ppr, pk=pk)

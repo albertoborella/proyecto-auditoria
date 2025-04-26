@@ -50,12 +50,8 @@
                             {{ form.texto }}
                         </div>
                         <div class="col-2 d-flex align-items-center">
-                          {% if forloop.first and not editando %}
-                          <button type="button" class="btn btn-outline-success btn-sm add-form">+</button>
-                          {% elif not forloop.first %}
-                          <button type="button" class="btn btn-outline-danger btn-sm remove-form">–</button>
-                          {% endif %}
-                      
+                            <button type="button" class="btn btn-outline-success btn-sm add-form">+</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-form ms-1">–</button>
                         </div>
                     </div>
                 {% endfor %}
@@ -68,7 +64,8 @@
                         <input type="text" name="referencia_set-__prefix__-texto" class="form-control form-control-sm" placeholder="Ej: Codex Alimentarius" id="id_referencia_set-__prefix__-texto">
                     </div>
                     <div class="col-2 d-flex align-items-center">
-                        <button type="button" class="btn btn-outline-danger btn-sm remove-form">–</button>
+                        <button type="button" class="btn btn-outline-success btn-sm add-form">+</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-form ms-1">–</button>
                     </div>
                 </div>
             </div>
@@ -88,22 +85,38 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalFormsInput = document.getElementById('id_referencia_set-TOTAL_FORMS');
     const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
 
-    document.addEventListener('click', function (e) {
+    function actualizarIndices() {
+        const forms = formsetDiv.querySelectorAll('.referencia-form');
+        forms.forEach((form, index) => {
+            const input = form.querySelector('input');
+            if (input) {
+                input.name = `referencia_set-${index}-texto`;
+                input.id = `id_referencia_set-${index}-texto`;
+            }
+        });
+        totalFormsInput.value = forms.length;
+    }
+
+    formsetDiv.addEventListener('click', function (e) {
         if (e.target.classList.contains('add-form')) {
-            const formIndex = parseInt(totalFormsInput.value);
-            const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
-            formsetDiv.insertAdjacentHTML('beforeend', newFormHtml);
-            totalFormsInput.value = formIndex + 1;
+            const newForm = document.createElement('div');
+            newForm.innerHTML = emptyFormTemplate.trim();
+            formsetDiv.appendChild(newForm.firstChild);
+            actualizarIndices();
         }
 
         if (e.target.classList.contains('remove-form')) {
             const form = e.target.closest('.referencia-form');
-            if (form) form.remove();
+            if (form) {
+                form.remove();
+                actualizarIndices();
+            }
         }
     });
 });
 </script>
 {% endblock %}
+
 
 
 

@@ -6,7 +6,7 @@
 
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
             <h2 class="mb-0" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
-                Lista de Prerrequisitos
+                Lista de Prerrequisitos <span style="font-size: 18px; font-family: Arial, Helvetica, sans-serif;">(Fuente: Lic. Antonio Martín Marelli)</span>
             </h2>
             <a href="{% url 'crear_ppr' %}" class="btn btn-primary btn-sm">
                 + Nuevo Prerrequisito
@@ -24,7 +24,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for ppr in pprs %}
+                    {% for ppr in page_obj %}
                     <tr>
                         <td class="text-center">{{ ppr.numero }}</td>
                         <td>{{ ppr.requisito }}</td>
@@ -46,7 +46,7 @@
                     </tr>
                     {% endfor %}
                 </tbody>
-                {% for ppr in pprs %}
+                {% for ppr in page_obj %}
                 <div class="modal fade" id="modalEliminar{{ ppr.pk }}" tabindex="-1" aria-labelledby="modalLabel{{ ppr.pk }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -72,5 +72,41 @@
         </div>
     </div>
 </div>
+<!-- Paginación -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">Anterior</span>
+        </li>
+      {% endif %}
+  
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="page-item active">
+            <span class="page-link">{{ num }}</span>
+          </li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+  
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">Siguiente</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
 {% endblock %}
 

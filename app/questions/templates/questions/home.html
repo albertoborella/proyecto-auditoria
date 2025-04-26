@@ -55,16 +55,26 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ms-5 me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'lista_auditorias' %}active{% endif %}" href="{% url 'lista_auditorias' %}">Listado</a>
+      <ul class="navbar-nav ms-5 me-auto mb-2 mb-lg-0">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Auditorias
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="{% url 'lista_auditorias' %}">Listado de auditorias</a></li>
+              <li><a class="dropdown-item" href="{% url 'nueva_auditoria' %}">Crear nueva auditoria</a></li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'nueva_auditoria' %}active{% endif %}" href="{% url 'nueva_auditoria' %}">Nueva</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'construccion' %}active{% endif %}" href="{% url 'construccion' %}">Legislación</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Normativas
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="{% url 'lista_ppr' %}">Prerequisitos</a></li>
+              <li><a class="dropdown-item" href="{% url 'construccion' %}">HACCP</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'construccion' %}">Casos hipoteticos</a></li>
+            </ul>
           </li>
         </ul>
 
@@ -80,16 +90,7 @@
     </div>
   </nav>
 
-  {% block content %}
-  {% endblock %}
-
-  {% block scripts %}
-  {% endblock %}
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-  <img src="{% static 'img/auditoria3.png' %}" class="img-fluid" style="width: 100%; height: 50vh; object-fit: cover; display: block;" alt="Fondo Auditoría">
+  <img src="{% static 'img/auditoria3.png' %}" class="img-fluid" style="width: 100%; height: 45vh; object-fit: cover; display: block;" alt="Fondo Auditoría">
 
 <div class="container">
     <div class="card" style="padding: 20px;
