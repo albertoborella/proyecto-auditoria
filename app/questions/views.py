@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.db.models import Sum
 from django.contrib import messages
@@ -7,6 +8,7 @@ from django.template.loader import get_template
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator 
+from django.db.models import Q  # Para búsquedas flexibles
 from weasyprint import HTML
 import unicodedata
 import re
@@ -14,6 +16,10 @@ from django.forms import modelformset_factory
 from django.utils.text import slugify
 from .forms import AuditoriaForm, PprForm, ReferenciaFormSet
 from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist, Ppr, Referencia
+
+def superuser_required(view_func):
+    decorated_view_func = user_passes_test(lambda user: user.is_superuser)(view_func)
+    return decorated_view_func
 
 @login_required
 def home(request):
@@ -108,7 +114,6 @@ def resultado_auditoria(request, auditoria_id):
     })
 
 
-from django.db.models import Count
 
 @login_required
 def lista_auditorias(request):
@@ -171,7 +176,7 @@ def lista_auditorias(request):
         'valor_seleccionado': valor,
     })
 
-@login_required
+@superuser_required
 def eliminar_auditoria(request, auditoria_id):
     auditoria = get_object_or_404(Auditoria, id=auditoria_id)
 
@@ -241,7 +246,7 @@ def obtener_preguntas_por_checklist(request):
 def modulo_construccion(request):
     return render(request,'questions/modulo_construccion.html')
 
-# views.py
+@superuser_required
 def crear_ppr(request):
     if request.method == 'POST':
         ppr_form = PprForm(request.POST)
@@ -262,7 +267,11 @@ def crear_ppr(request):
 
 
 def lista_ppr(request):
+    query = request.GET.get('q', '')  # 'q' será el nombre del input de búsqueda
     pprs = Ppr.objects.prefetch_related('referencias').all().order_by('numero')
+
+    if query:
+        pprs = pprs.filter(Q(requisito__icontains=query))
 
     paginator = Paginator(pprs, 5)  # 5 registros por página
     page_number = request.GET.get('page')
@@ -270,11 +279,13 @@ def lista_ppr(request):
 
     context = {
         'page_obj': page_obj,
+        'query': query,  # Para mantener el texto buscado en el input
     }
 
     return render(request, 'questions/lista_ppr.html', context)
 
 
+@superuser_required
 def editar_ppr(request, pk):
     ppr = get_object_or_404(Ppr, pk=pk)
 
@@ -311,6 +322,7 @@ def editar_ppr(request, pk):
         'ppr': ppr
     })
 
+@superuser_required
 def eliminar_ppr(request, pk):
     ppr = get_object_or_404(Ppr, pk=pk)
     if request.method == 'POST':

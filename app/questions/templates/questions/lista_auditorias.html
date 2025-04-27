@@ -87,9 +87,11 @@
                         
                         
                         <td class="text-nowrap">
+                            {% if user.is_authenticated and user.is_superuser %}
                             <a href="{% url 'eliminar_auditoria' item.auditoria.id %}" class="btn btn-sm btn-outline-danger" title="Eliminar">
                                 <i class="bi bi-trash"></i>
                             </a>
+                            {% endif %}
                             {% if item.auditoria.resultado_pdf %}
                             <a href="{{ item.auditoria.resultado_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-success" title="Ver PDF">
                                 <i class="bi bi-file-earmark-pdf"></i>

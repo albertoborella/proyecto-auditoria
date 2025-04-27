@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PreguntaPredefinida, Cliente, Auditor, Auditoria, Respuesta, Checklist
+from .models import PreguntaPredefinida, Cliente, Auditor, Auditoria, Respuesta, Checklist, Ppr, Referencia
 
 @admin.register(PreguntaPredefinida)
 class PreguntaPredefinidaAdmin(admin.ModelAdmin):
@@ -12,8 +12,11 @@ class ChecklistAdmin(admin.ModelAdmin):
     list_display = ('nombre',)
     search_fields = ('nombre',)
 
-admin.site.register(Cliente)
 admin.site.register(Auditor)
 admin.site.register(Auditoria)
-admin.site.register(Respuesta)
 admin.site.register(Checklist, ChecklistAdmin)
+admin.site.register(Cliente)
+admin.site.register(Ppr)
+admin.site.register(Referencia)
+admin.site.register(Respuesta)
+

@@ -62,7 +62,9 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="{% url 'lista_auditorias' %}">Listado de auditorias</a></li>
+              {% if user.is_authenticated and user.is_superuser %}
               <li><a class="dropdown-item" href="{% url 'nueva_auditoria' %}">Crear nueva auditoria</a></li>
+              {% endif %}
             </ul>
           </li>
           <li class="nav-item dropdown">
