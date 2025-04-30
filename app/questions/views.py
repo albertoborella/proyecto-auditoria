@@ -15,7 +15,7 @@ import re
 from django.forms import modelformset_factory
 from django.utils.text import slugify
 from .forms import AuditoriaForm, PprForm, ReferenciaFormSet
-from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist, Ppr, Referencia
+from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist, Ppr, Referencia, Cliente
 
 def superuser_required(view_func):
     decorated_view_func = user_passes_test(lambda user: user.is_superuser)(view_func)
@@ -119,15 +119,17 @@ def resultado_auditoria(request, auditoria_id):
 def lista_auditorias(request):
     filtro = request.GET.get('filtro')
     valor = request.GET.get('valor')
-
     auditorias = Auditoria.objects.all().order_by('-fecha')
-
     # Aplicar filtro
     if filtro == 'cliente' and valor:
-        auditorias = auditorias.filter(cliente=valor)
+        # Obtener el cliente por nombre
+        try:
+            cliente_id = Cliente.objects.get(nombre=valor).id
+            auditorias = auditorias.filter(cliente_id=cliente_id)
+        except Cliente.DoesNotExist:
+            auditorias = auditorias.none()  # Si no existe el cliente, no mostrar auditorías
     elif filtro == 'checklist' and valor:
         auditorias = auditorias.filter(checklist__nombre=valor)
-
     # Procesar puntaje por auditoría
     auditorias_con_puntaje = []
     for auditoria in auditorias:
@@ -140,32 +142,24 @@ def lista_auditorias(request):
         else:
             puntaje_total = "SIN PUNTAJE"
             resultado = "INFORME DEL AUDITOR"
-
         auditorias_con_puntaje.append({
             'auditoria': auditoria,
             'puntaje_total': puntaje_total,
             'resultado': resultado,
             'checklist': auditoria.checklist
         })
-
     # Obtener listas únicas de clientes y tipos de checklist
-    clientes_unicos = Auditoria.objects.values_list('cliente', flat=True).distinct()
+    clientes_unicos = Cliente.objects.values('nombre').distinct()
     tipos_checklist_unicos = Checklist.objects.values_list('nombre', flat=True).distinct()
-
     # Paginación
     paginator = Paginator(auditorias_con_puntaje, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
     # Total de auditorías (para numeración descendente)
     total = paginator.count
-
-    # Agregamos índice descendente a cada auditoría
     start_index = page_obj.start_index()
     for idx, item in enumerate(page_obj, start=start_index):
         item['numero_descendente'] = total - idx + 1
-
-
     return render(request, 'questions/lista_auditorias.html', {
         'auditorias': page_obj,
         'page_obj': page_obj,

@@ -18,14 +18,14 @@
                     </select>
         
                     {% if filtro_seleccionado == 'cliente' %}
-                        <select name="valor" class="form-select form-select-sm">
-                            <option value="">Selecciona un cliente</option>
-                            {% for cliente in clientes %}
-                                <option value="{{ cliente }}" {% if cliente == valor_seleccionado %}selected{% endif %}>
-                                    {{ cliente }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                    <select name="valor" class="form-select form-select-sm">
+                        <option value="">Selecciona un cliente</option>
+                        {% for cliente in clientes %}
+                            <option value="{{ cliente.nombre }}" {% if cliente.nombre == valor_seleccionado %}selected{% endif %}>
+                                {{ cliente.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
                     {% elif filtro_seleccionado == 'checklist' %}
                         <select name="valor" class="form-select form-select-sm">
                             <option value="">Selecciona un checklist</option>

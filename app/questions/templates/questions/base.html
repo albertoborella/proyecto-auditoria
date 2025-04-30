@@ -56,29 +56,42 @@
       </button>
 
       <ul class="navbar-nav ms-5 me-auto mb-2 mb-lg-0">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Auditorias
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="{% url 'lista_auditorias' %}">Listado de auditorias</a></li>
-              {% if user.is_authenticated and user.is_superuser %}
-              <li><a class="dropdown-item" href="{% url 'nueva_auditoria' %}">Crear nueva auditoria</a></li>
-              {% endif %}
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Normativas
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="{% url 'lista_ppr' %}">Prerequisitos</a></li>
-              <li><a class="dropdown-item" href="{% url 'construccion' %}">HACCP</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="{% url 'construccion' %}">Casos hipoteticos</a></li>
-            </ul>
-          </li>
-        </ul>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" style="font-size: 14px; font-weight: 400;" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Auditorias
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="{% url 'lista_auditorias' %}">Listado de auditorias</a></li>
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="{% url 'nueva_auditoria' %}">Crear nueva auditoria</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="{% url 'lista_ppr' %}">Normas Prerrequisitos</a></li>
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="{% url 'construccion' %}">Normas HACCP</a></li>
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="{% url 'construccion' %}">Casos hipoteticos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+        </li>
+        {% if user.is_superuser %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" style="font-size: 14px; font-weight: 400;" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Controles
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="#">Calidad de Agua</a></li>
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="#">Manejo Integral Plagas</a></li>
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="#">CREHA - Residuos en leche</a></li>
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="#">ATB + en leche cruda</a></li>
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="#">Control de Registros</a></li>
+            <li><a class="dropdown-item" style="font-size: 13px; font-weight: 400;" href="#">Procedimientos</a></li>
+          </ul>
+        </li>
+        {% endif %}
+        <li>
+          <a class="nav-link" style="font-size: 14px; font-weight: 400;" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Normas Nacionales e Internacionales
+          </a>
+        </li>
+      </ul>
 
         {% if user.is_authenticated %}
         <div class="d-flex align-items-center">
