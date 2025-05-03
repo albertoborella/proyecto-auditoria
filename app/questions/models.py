@@ -146,3 +146,32 @@ class Referencia(models.Model):
 
     def __str__(self):
         return self.texto
+    
+class TipoNorma(models.Model):
+    nombre = models.CharField(max_length=100)
+    class Meta:
+        ordering = ['nombre']
+    def __str__(self):
+        return self.nombre
+
+
+class TipoSeccion(models.Model):
+    nombre = models.CharField(max_length=100)
+    class Meta:
+        ordering = ['nombre']
+    def __str__(self):
+        return self.nombre
+
+
+class Norma(models.Model):
+    tipo_norma = models.ForeignKey(TipoNorma, on_delete=models.CASCADE)
+    numero_norma = models.CharField(max_length=20, null=True, blank=True)
+    fecha = models.DateField()
+    seccion = models.ForeignKey(TipoSeccion, on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=100)
+    norma_pdf = models.FileField(upload_to='normativas/', null=True, blank=True)
+    activa = models.BooleanField(default=True)
+    class Meta:
+        ordering = ['seccion']
+    def __str__(self):
+        return f"{self.tipo_norma}/{self.numero_norma}"

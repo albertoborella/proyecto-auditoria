@@ -1,5 +1,5 @@
 from django import forms
-from .models import Auditoria, Ppr, Referencia
+from .models import Auditoria, Ppr, Referencia, Norma
 from django.forms import inlineformset_factory, modelformset_factory
 
 class AuditoriaForm(forms.ModelForm):
@@ -66,3 +66,43 @@ ReferenciaFormSetEdit = modelformset_factory(
     extra=0,  # no crea formularios adicionales por defecto
     can_delete=True  # opcional, si querés permitir eliminar referencias al editar
 )
+
+class NormaForm(forms.ModelForm):
+    class Meta:
+        model = Norma
+        fields = [
+            'tipo_norma',
+            'numero_norma',
+            'fecha',
+            'seccion',
+            'titulo',
+            'norma_pdf',
+            'activa',
+        ]
+        widgets = {
+            'tipo_norma': forms.Select(attrs={'class': 'form-control'}),
+            'numero_norma': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de Norma'}),
+            'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'seccion': forms.Select(attrs={'class': 'form-control'}),
+            'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título de la Norma'}),
+            'norma_pdf': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'activa': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'tipo_norma': 'Tipo de Norma',
+            'numero_norma': 'Número de Norma',
+            'fecha': 'Fecha',
+            'seccion': 'Sección',
+            'titulo': 'Título',
+            'norma_pdf': 'Archivo PDF',
+            'activa': '¿Es activa?',
+        }
+        help_texts = {
+            'numero_norma': 'Ingrese el número de la norma, si aplica.',
+            'norma_pdf': 'Suba el archivo en formato PDF, si aplica.',
+        }
+        error_messages = {
+            'numero_norma': {
+                'max_length': "El número de norma no puede exceder los 20 caracteres.",
+            },
+        }

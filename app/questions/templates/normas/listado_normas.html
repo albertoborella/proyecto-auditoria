@@ -1,0 +1,117 @@
+{% extends 'questions/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-4">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <h2 class="mb-0" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
+                Lista de Normas
+            </h2>
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <form method="get" class="d-flex gap-2 align-items-center">
+                    <select name="filtro" class="form-select form-select-sm" id="filtroSelect">
+                        <option value="">Filtrar por...</option>
+                        <option value="seccion" {% if filtro_seleccionado == 'seccion' %}selected{% endif %}>Sección</option>
+                        <option value="numero" {% if filtro_seleccionado == 'numero' %}selected{% endif %}>Número</option>
+                    </select>
+                    
+                    <!-- Filtro por sección -->
+                    <div id="seccionContainer" style="display: {% if filtro_seleccionado == 'seccion' %}block{% else %}none{% endif %};">
+                        <select name="valor_seccion" class="form-select form-select-sm">
+                            <option value="">Selecciona una sección</option>
+                            {% for seccion in secciones %}
+                                <option value="{{ seccion.id }}" {% if seccion.id|stringformat:"s" == valor_seleccionado %}selected{% endif %}>
+                                    {{ seccion.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Filtro por número -->
+                    <div id="numeroContainer" style="display: {% if filtro_seleccionado == 'numero' %}block{% else %}none{% endif %};">
+                        <input type="text" name="valor_numero" class="form-control form-control-sm" placeholder="Número de norma" value="{% if filtro_seleccionado == 'numero' %}{{ valor_seleccionado }}{% endif %}">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Aplicar</button>
+                    <a href="{% url 'normas_listar' %}" class="btn btn-outline-secondary btn-sm">Reset</a>
+                </form>
+                <a href="{% url 'normas_agregar' %}" class="btn btn-primary btn-sm">
+                    + Nueva Norma
+                </a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center align-middle table-sm small">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>Tipo de Norma</th>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Sección</th>
+                        <th>Título</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for norma in normas %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ norma.tipo_norma }}</td>
+                        <td>{{ norma.numero_norma }}</td>
+                        <td>{{ norma.fecha }}</td>
+                        <td>{{ norma.seccion }}</td>
+                        <td>{{ norma.titulo }}</td>
+                        <td class="text-nowrap">
+                            {% if norma.norma_pdf %}
+                            <a href="{{ norma.norma_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-success" title="Ver PDF">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">No se encontraron normas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('filtroSelect').addEventListener('change', function() {
+    const seccionContainer = document.getElementById('seccionContainer');
+    const numeroContainer = document.getElementById('numeroContainer');
+    if (this.value === 'seccion') {
+        seccionContainer.style.display = 'block';
+        numeroContainer.style.display = 'none';
+    } else if (this.value === 'numero') {
+        seccionContainer.style.display = 'none';
+        numeroContainer.style.display = 'block';
+    } else {
+        seccionContainer.style.display = 'none';
+        numeroContainer.style.display = 'none';
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const filtroValue = "{{ filtro_seleccionado }}";
+    const seccionContainer = document.getElementById('seccionContainer');
+    const numeroContainer = document.getElementById('numeroContainer');
+    if (filtroValue === 'seccion') {
+        seccionContainer.style.display = 'block';
+        numeroContainer.style.display = 'none';
+    } else if (filtroValue === 'numero') {
+        seccionContainer.style.display = 'none';
+        numeroContainer.style.display = 'block';
+    } else {
+        seccionContainer.style.display = 'none';
+        numeroContainer.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

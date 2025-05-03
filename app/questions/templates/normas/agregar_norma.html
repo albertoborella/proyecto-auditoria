@@ -1,0 +1,91 @@
+{% extends 'questions/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="position-relative" style="width: 100%; height: 50vh; overflow: hidden;">
+    <img src="{% static 'img/marco_legal.png' %}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="Banner Auditoría">
+    <div class="position-absolute top-50 start-50 translate-middle text-white text-center">
+        <h1 style="
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+            letter-spacing: 1px;
+            padding-top: 40px;
+        ">
+            AGREGAR NORMATIVA
+        </h1>
+    </div>
+</div>
+<div class="container mt-4" style="max-width: 720px;">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0" style="font-family: 'Montserrat', sans-serif;">Agrega Norma</h2>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">Cancelar</a>
+        </div>
+        <form method="post" class="w-100" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="id_tipo_norma" class="form-label">{{ form.tipo_norma.label }}</label>
+                    {{ form.tipo_norma|add_class:"form-control" }}
+                    {% if form.tipo_norma.errors %}
+                        <div class="text-danger">{{ form.tipo_norma.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label for="id_numero_norma" class="form-label">{{ form.numero_norma.label }}</label>
+                    {{ form.numero_norma|add_class:"form-control" }}
+                    {% if form.numero_norma.errors %}
+                        <div class="text-danger">{{ form.numero_norma.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label for="id_fecha" class="form-label">{{ form.fecha.label }}</label>
+                    {{ form.fecha|add_class:"form-control" }}
+                    {% if form.fecha.errors %}
+                        <div class="text-danger">{{ form.fecha.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label for="id_seccion" class="form-label">{{ form.seccion.label }}</label>
+                    {{ form.seccion|add_class:"form-control" }}
+                    {% if form.seccion.errors %}
+                        <div class="text-danger">{{ form.seccion.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <label for="id_titulo" class="form-label">{{ form.titulo.label }}</label>
+                    {{ form.titulo|add_class:"form-control" }}
+                    {% if form.titulo.errors %}
+                        <div class="text-danger">{{ form.titulo.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-9">
+                    <label for="id_norma_pdf" class="form-label" style="font-size: 12px;">{{ form.norma_pdf.label }}</label>
+                    <span style="font-size: 12px;">{{ form.norma_pdf|add_class:"form-control-file" }}</span>
+                    {% if form.norma_pdf.errors %}
+                        <div class="text-danger">{{ form.norma_pdf.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check">
+                        {{ form.activa|add_class:"form-check-input" }}
+                        <label class="form-check-label" for="id_activa">{{ form.activa.label }}</label>
+                    </div>
+                    {% if form.activa.errors %}
+                        <div class="text-danger">{{ form.activa.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button id="btn-crear" type="submit" class="btn btn-primary btn-sm px-4 mt-2">
+                    Grabar
+                    <i class="bi bi-save2 ms-1"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

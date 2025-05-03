@@ -14,8 +14,8 @@ import unicodedata
 import re
 from django.forms import modelformset_factory
 from django.utils.text import slugify
-from .forms import AuditoriaForm, PprForm, ReferenciaFormSet
-from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist, Ppr, Referencia, Cliente
+from .forms import AuditoriaForm, PprForm, ReferenciaFormSet, NormaForm
+from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist, Ppr, Referencia, Cliente, Norma,TipoSeccion
 
 def superuser_required(view_func):
     decorated_view_func = user_passes_test(lambda user: user.is_superuser)(view_func)
@@ -324,3 +324,47 @@ def eliminar_ppr(request, pk):
         return redirect('lista_ppr')
     return render(request, 'questions/confirmar_eliminar_ppr.html', {'ppr': ppr})
 
+
+
+
+
+
+
+
+@login_required
+def listado_normas(request):
+    normas = Norma.objects.all()
+    secciones = TipoSeccion.objects.all()
+
+    filtro_seleccionado = request.GET.get('filtro')
+    valor_seleccionado = None  # inicializamos
+
+    if filtro_seleccionado == 'seccion':
+        valor_seleccionado = request.GET.get('valor_seccion')
+        if valor_seleccionado:
+            normas = normas.filter(seccion_id=valor_seleccionado)
+    elif filtro_seleccionado == 'numero':
+        valor_seleccionado = request.GET.get('valor_numero')
+        if valor_seleccionado:
+            normas = normas.filter(numero_norma__icontains=valor_seleccionado)
+
+    context = {
+        'normas': normas,
+        'secciones': secciones,
+        'filtro_seleccionado': filtro_seleccionado,
+        'valor_seleccionado': valor_seleccionado,
+    }
+    return render(request, 'normas/listado_normas.html', context)
+
+
+@login_required
+def agregar_norma(request):
+    if request.method == 'POST':
+        form = NormaForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Norma agregada exitosamente.')
+            return redirect('normas_listar')
+    else:
+        form = NormaForm()
+    return render(request, 'normas/agregar_norma.html', {'form': form})
