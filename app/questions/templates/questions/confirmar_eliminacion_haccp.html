@@ -1,0 +1,28 @@
+{% extends 'questions/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg p-4" style="max-width: 600px; width: 100%; border-radius: 1rem;">
+        <div class="card-body text-center">
+            <h2 class="mb-3" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 24px; color: #b02a37;">
+                Confirmar Eliminación
+            </h2> 
+            <p style="font-size: 16px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                ¿Estás seguro de que deseas eliminar el item nº: <strong>"{{ haccp }}"</strong>?
+            </p>
+            <hr class="my-4">
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-trash3"></i> Eliminar
+                    </button>
+                    <a href="{% url 'lista_haccp' %}" class="btn btn-outline-secondary px-4">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

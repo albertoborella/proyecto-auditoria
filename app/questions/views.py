@@ -14,8 +14,8 @@ import unicodedata
 import re
 from django.forms import modelformset_factory
 from django.utils.text import slugify
-from .forms import AuditoriaForm, PprForm, ReferenciaFormSet, NormaForm
-from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist, Ppr, Referencia, Cliente, Norma,TipoSeccion
+from .forms import AuditoriaForm, PprForm, ReferenciaFormSet, NormaForm, HaccpForm, Ref_haccpForm, RefFormSet, NcForm, Ref_noconformidadesForm
+from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist, Ppr, Referencia, Cliente, Norma,TipoSeccion,Haccp,Ref_haccp, NoConformidades, Ref_noconformidades
 
 def superuser_required(view_func):
     decorated_view_func = user_passes_test(lambda user: user.is_superuser)(view_func)
@@ -325,12 +325,6 @@ def eliminar_ppr(request, pk):
     return render(request, 'questions/confirmar_eliminar_ppr.html', {'ppr': ppr})
 
 
-
-
-
-
-
-
 @login_required
 def listado_normas(request):
     normas = Norma.objects.all()
@@ -356,7 +350,6 @@ def listado_normas(request):
     }
     return render(request, 'normas/listado_normas.html', context)
 
-
 @login_required
 def agregar_norma(request):
     if request.method == 'POST':
@@ -368,3 +361,114 @@ def agregar_norma(request):
     else:
         form = NormaForm()
     return render(request, 'normas/agregar_norma.html', {'form': form})
+
+def lista_haccp(request):
+    query = request.GET.get('q', '')  # 'q' será el nombre del input de búsqueda
+    haccp_list = Haccp.objects.prefetch_related('ref_haccp').all().order_by('numero')
+
+    if query:
+        haccp_list = Haccp.objects.filter(Q(principio__icontains=query))
+    else:
+        haccp_list = Haccp.objects.all()
+
+    paginator = Paginator(haccp_list, 5)  # 5 registros por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'query': query,  # Para mantener el texto buscado en el input
+    }
+
+    return render(request, 'questions/lista_haccp.html', context)
+
+@superuser_required
+def crear_haccp(request):
+    if request.method == 'POST':
+        haccp_form = HaccpForm(request.POST)
+        formset = RefFormSet(request.POST, prefix='referencia_set')
+        if haccp_form.is_valid() and formset.is_valid():
+            haccp = haccp_form.save()
+            for ref_form in formset:
+                if ref_form.cleaned_data and ref_form.cleaned_data.get('texto'):
+                    ref = ref_form.save(commit=False)
+                    ref.haccp_list = haccp
+                    ref.save()
+                    print(f"Referencia guardada: {ref.texto}")  # Para depuración
+            return redirect('lista_haccp')
+        else:
+            print("Errores en formularios:")
+            print(haccp_form.errors)
+            print(formset.errors)
+    else:
+        haccp_form = HaccpForm()
+        formset = RefFormSet(queryset=Ref_haccp.objects.none(), prefix='referencia_set')
+    return render(request, 'questions/crear_haccp.html', {
+        'haccp_form': haccp_form,
+        'formset': formset
+    })
+
+@superuser_required
+def eliminar_haccp(request, pk):
+    haccp = get_object_or_404(Haccp, pk=pk)
+    if request.method == 'POST':
+        haccp.delete()
+        return redirect('lista_haccp')
+    return render(request, 'questions/confirmar_eliminacion_haccp.html', {'haccp': haccp})
+
+
+#Views No Conformidades
+@superuser_required
+def crear_nc(request):
+    if request.method == 'POST':
+        nc_form = NcForm(request.POST)
+        formset = RefFormSet(request.POST, prefix='referencia_set')
+        if nc_form.is_valid() and formset.is_valid():
+            nc = nc_form.save()
+            for ref_form in formset:
+                if ref_form.cleaned_data and ref_form.cleaned_data.get('texto'):
+                    ref = ref_form.save(commit=False)
+                    ref.nc_lista = nc
+                    ref.save()
+                    print(f"Referencia guardada: {ref.texto}")  # Para depuración
+            return redirect('lista_nc')
+        else:
+            print("Errores en formularios:")
+            print(nc_form.errors)
+            print(formset.errors)
+    else:
+        nc_form = NcForm()
+        formset = RefFormSet(queryset=Ref_haccp.objects.none(), prefix='referencia_set')
+    return render(request, 'questions/crear_nc.html', {
+        'nc_form': nc_form,
+        'formset': formset
+    })
+
+
+
+def lista_nc(request):
+    query = request.GET.get('q', '')
+    if query:
+        nc_lista = NoConformidades.objects.filter(Q(seccion__icontains=query) | Q(nc__icontains=query)).prefetch_related('ref_noconformidades')
+    else:
+        nc_lista = NoConformidades.objects.all().prefetch_related('ref_noconformidades')
+
+    paginator = Paginator(nc_lista, 5)  # 5 registros por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'query': query,  # Para mantener el texto buscado en el input
+    }
+
+    return render(request, 'questions/lista_nc.html', context)
+
+@superuser_required
+def eliminar_nc(request, pk):
+    nc = get_object_or_404(NoConformidades, pk=pk)
+    if request.method == 'POST':
+        nc.delete()
+        return redirect('lista_nc')
+    return render(request, 'questions/confirmar_eliminacion_nc.html', {'nc': nc})
+

@@ -175,3 +175,36 @@ class Norma(models.Model):
         ordering = ['seccion']
     def __str__(self):
         return f"{self.tipo_norma}/{self.numero_norma}"
+    
+# Modelos HACCP
+class Haccp(models.Model):
+    numero = models.CharField(max_length=5)
+    fase = models.CharField(max_length=30)
+    principio = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.fase} - {self.principio}"
+    
+class Ref_haccp(models.Model):
+    haccp_list = models.ForeignKey(Haccp, related_name='ref_haccp', on_delete=models.CASCADE)
+    texto = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.texto
+    
+class NoConformidades(models.Model):
+    numero = models.CharField(max_length=10)
+    seccion = models.TextField(max_length=100, blank=True, null=True)
+    nc = models.TextField(max_length=255, blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.seccion} - {self.nc}"
+    
+
+class Ref_noconformidades(models.Model):
+    nc_lista = models.ForeignKey(NoConformidades, related_name='ref_noconformidades', on_delete=models.CASCADE)
+    texto = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.texto
+

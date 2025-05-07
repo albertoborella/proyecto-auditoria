@@ -1,5 +1,5 @@
 from django import forms
-from .models import Auditoria, Ppr, Referencia, Norma
+from .models import Auditoria, Ppr, Referencia, Norma, Haccp, Ref_haccp, NoConformidades, Ref_noconformidades
 from django.forms import inlineformset_factory, modelformset_factory
 
 class AuditoriaForm(forms.ModelForm):
@@ -106,3 +106,67 @@ class NormaForm(forms.ModelForm):
                 'max_length': "El número de norma no puede exceder los 20 caracteres.",
             },
         }
+
+class HaccpForm(forms.ModelForm):
+    class Meta:
+        model = Haccp
+        fields = ['numero', 'fase', 'principio']
+        widgets = {
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Ej: A.1'
+            }),
+            'fase': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Describa fase del proceso'
+            }),
+            'principio': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Describa el principio'
+            }),
+        }
+
+class Ref_haccpForm(forms.ModelForm):
+    class Meta:
+        model = Ref_haccp
+        fields = ['texto']
+        widgets = {
+            'texto': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Ej: Codex Alimentarius - Sección 5'
+            })
+        }
+
+RefFormSet = modelformset_factory(Ref_haccp, fields=('texto',), extra=1)
+
+class NcForm(forms.ModelForm):
+    class Meta:
+        model = NoConformidades
+        fields = ['numero', 'seccion', 'nc']
+        widgets = {
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Coloque número de órden'
+            }),
+            'seccion': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Sección a la que se refiere'
+            }),
+            'nc': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Describa la No Conformidad'
+            }),
+        }
+
+class Ref_noconformidadesForm(forms.ModelForm):
+    class Meta:
+        model = Ref_noconformidades
+        fields = ['texto']
+        widgets = {
+            'texto': forms.TextInput(attrs={
+                'class': 'form-control form-control-sm',
+                'placeholder': 'Colocar normativa interviniente'
+            })
+        }
+
+RefFormSet = modelformset_factory(Ref_noconformidades, fields=('texto',), extra=1)
