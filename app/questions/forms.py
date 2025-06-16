@@ -137,7 +137,7 @@ class Ref_haccpForm(forms.ModelForm):
             })
         }
 
-RefFormSet = modelformset_factory(Ref_haccp, fields=('texto',), extra=1)
+RefFormSet = modelformset_factory(Ref_haccp, fields=('texto',), extra=1, can_delete=False)
 
 class NcForm(forms.ModelForm):
     class Meta:
