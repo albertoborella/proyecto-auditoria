@@ -30,3 +30,7 @@ def get_observaciones(auditoria, pregunta_id):
         return respuesta.observaciones
     except Respuesta.DoesNotExist:
         return None
+    
+@register.filter(name='add_class')
+def add_class(field, css_class):
+    return field.as_widget(attrs={'class': css_class})

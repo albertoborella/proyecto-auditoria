@@ -1,0 +1,80 @@
+{% extends 'questions/base.html' %}
+{% load static %}
+{% block content %}
+<div style="background-color: #146e6c; min-height: 100vh">
+    <div class="container py-4">
+        <div class="bg-white p-4 rounded-4 shadow-sm">
+            <h2 class="mb-4 text-center" style="font-family: 'Montserrat', sans-serif; font-weight: 600">
+                Proveedores de leche cruda
+            </h2>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                {% if user.is_authenticated and user.is_superuser %}
+                <a href="{% url 'crear_unidad_productiva' %}" class="btn btn-outline-success btn-sm ms-2"
+                    style="margin-right: 2px;">
+                    + Nueva Unidad Productiva
+                </a>
+                {% endif %}
+                <form method="get" class="d-flex align-items-center">
+                    <div class="input-group me-2">
+                        <select name="codigo" class="form-select">
+                            <option value="">Código</option>
+                            {% for codigo in codigos %}
+                            <option value="{{ codigo }}">{{ codigo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group me-2">
+                        <select name="razon_social" class="form-select" style="width: 150px;">
+                            <option value="">Razón Social</option>
+                            {% for rz in razon_social %}
+                            <option value="{{ rz }}">{{ rz }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-outline-primary btn-sm ms-2">Buscar</button>
+                    <a href="{% url 'listar_unidades_productivas' %}" class="btn btn-outline-secondary btn-sm ms-2">Resetear</a>
+                </form>
+
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle table-sm small">
+                    <thead class="table-primary text-center">
+                        <tr>
+                            <th scope="col">Código</th>
+                            <th scope="col">Razón Social</th>
+                            <th scope="col">RENSPA</th>
+                            <th scope="col">Teléfono</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Ubicación</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for unidad in unidades %}
+                        <tr>
+                            <td>{{ unidad.codigo }}</td>
+                            <td>{{ unidad.razon_social }}</td>
+                            <td>{{ unidad.renspa }}</td>
+                            <td>{{ unidad.telefono }}</td>
+                            <td>{{ unidad.email }}</td>
+                            <td>{{ unidad.ubicacion }}</td>
+                            <td>
+                                <a href="{% url 'editar_unidad_productiva' unidad.id %}"
+                                    class="btn btn-warning btn-sm">Editar</a>
+                                <a href="{% url 'eliminar_unidad_productiva' unidad.id %}"
+                                    class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No hay unidades productivas registradas.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

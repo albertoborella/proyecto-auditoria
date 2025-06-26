@@ -1,6 +1,9 @@
 from django import forms
-from .models import Auditoria, Ppr, Referencia, Norma, Haccp, Ref_haccp, NoConformidades, Ref_noconformidades
 from django.forms import inlineformset_factory, modelformset_factory
+from .models import ( Auditoria, Ppr, Referencia, Norma, 
+                     Haccp, Ref_haccp, NoConformidades, 
+                     Ref_noconformidades, UnidadProductiva, 
+                     UnidadProductiva )
 
 class AuditoriaForm(forms.ModelForm):
     class Meta:
@@ -137,7 +140,7 @@ class Ref_haccpForm(forms.ModelForm):
             })
         }
 
-RefFormSet = modelformset_factory(Ref_haccp, fields=('texto',), extra=1, can_delete=False)
+RefHaccpFormSet = modelformset_factory(Ref_haccp, fields=('texto',), extra=1)
 
 class NcForm(forms.ModelForm):
     class Meta:
@@ -169,4 +172,18 @@ class Ref_noconformidadesForm(forms.ModelForm):
             })
         }
 
-RefFormSet = modelformset_factory(Ref_noconformidades, fields=('texto',), extra=1)
+RefNcFormSet = modelformset_factory(Ref_noconformidades, fields=('texto',), extra=1)
+
+# FORMULARIO DE INGRESO DE UNIDADES PRODUCTIVAS
+class UnidadProductivaForm(forms.ModelForm):
+    class Meta:
+        model = UnidadProductiva
+        fields = ['codigo', 'razon_social', 'renspa', 'telefono', 'email', 'ubicacion']
+        widgets = {
+            'codigo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el código'}),
+            'razon_social': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la razón social'}),
+            'renspa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el RENSPA'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el teléfono'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el email'}),
+            'ubicacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la ubicación'}),
+        }

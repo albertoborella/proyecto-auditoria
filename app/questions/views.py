@@ -7,15 +7,33 @@ from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
-from django.core.paginator import Paginator 
+from django.core.paginator import Paginator
 from django.db.models import Q  # Para búsquedas flexibles
 from weasyprint import HTML
 import unicodedata
 import re
 from django.forms import modelformset_factory
+from django.utils import timezone
 from django.utils.text import slugify
-from .forms import AuditoriaForm, PprForm, ReferenciaFormSet, NormaForm, HaccpForm, Ref_haccpForm, RefFormSet, NcForm, Ref_noconformidadesForm
-from .models import Auditoria, PreguntaPredefinida, Respuesta, Checklist, Ppr, Referencia, Cliente, Norma,TipoSeccion,Haccp,Ref_haccp, NoConformidades, Ref_noconformidades
+from .forms import (
+    AuditoriaForm,
+    PprForm,
+    ReferenciaFormSet,
+    NormaForm,
+    HaccpForm,
+    RefHaccpFormSet,  # ✅ formset correcto para Ref_haccp
+    RefNcFormSet,     # ✅ formset correcto para Ref_noconformidades
+    NcForm,
+    Ref_noconformidadesForm,
+    UnidadProductivaForm,
+)
+
+from .models import (Auditoria, PreguntaPredefinida, Respuesta, Checklist,
+                     Ppr, Referencia, Cliente, Norma, TipoSeccion, 
+                     Haccp, Ref_haccp, NoConformidades, Ref_noconformidades, 
+                     MuestraAgua, ResultadoAnalisisAgua, PlantaIndustrial, TipoAnalisisAgua,
+                     UnidadProductiva)
+
 
 def superuser_required(view_func):
     decorated_view_func = user_passes_test(lambda user: user.is_superuser)(view_func)
@@ -113,8 +131,6 @@ def resultado_auditoria(request, auditoria_id):
         'usa_puntaje': auditoria.checklist.usa_puntaje,
     })
 
-
-
 @login_required
 def lista_auditorias(request):
     filtro = request.GET.get('filtro')
@@ -170,15 +186,6 @@ def lista_auditorias(request):
         'valor_seleccionado': valor,
     })
 
-@superuser_required
-def eliminar_auditoria(request, auditoria_id):
-    auditoria = get_object_or_404(Auditoria, id=auditoria_id)
-
-    if request.method == 'POST':
-        auditoria.delete()
-        messages.success(request, 'La auditoría ha sido eliminada exitosamente.')
-        return redirect('lista_auditorias')
-    return render(request, 'questions/confirmar_eliminacion.html', {'auditoria': auditoria})
 
 def limpiar_nombre(nombre):
     # Normaliza acentos y elimina caracteres problemáticos
@@ -237,9 +244,20 @@ def obtener_preguntas_por_checklist(request):
     print(f"Cantidad de preguntas devueltas: {len(data)}")
     return JsonResponse(data, safe=False)
 
+@superuser_required
+def eliminar_auditoria(request, auditoria_id):
+    auditoria = get_object_or_404(Auditoria, id=auditoria_id)
+
+    if request.method == 'POST':
+        auditoria.delete()
+        messages.success(request, 'La auditoría ha sido eliminada exitosamente.')
+        return redirect('lista_auditorias')
+    return render(request, 'questions/confirmar_eliminacion.html', {'auditoria': auditoria})
+
 def modulo_construccion(request):
     return render(request,'questions/modulo_construccion.html')
 
+# views para Prerrequisitos
 @superuser_required
 def crear_ppr(request):
     if request.method == 'POST':
@@ -277,7 +295,6 @@ def lista_ppr(request):
     }
 
     return render(request, 'questions/lista_ppr.html', context)
-
 
 @superuser_required
 def editar_ppr(request, pk):
@@ -324,7 +341,6 @@ def eliminar_ppr(request, pk):
         return redirect('lista_ppr')
     return render(request, 'questions/confirmar_eliminar_ppr.html', {'ppr': ppr})
 
-
 @login_required
 def listado_normas(request):
     normas = Norma.objects.all()
@@ -349,6 +365,7 @@ def listado_normas(request):
         'valor_seleccionado': valor_seleccionado,
     }
     return render(request, 'normas/listado_normas.html', context)
+
 
 @login_required
 def agregar_norma(request):
@@ -386,7 +403,7 @@ def lista_haccp(request):
 def crear_haccp(request):
     if request.method == 'POST':
         haccp_form = HaccpForm(request.POST)
-        formset = RefFormSet(request.POST, prefix='referencia_set')
+        formset = RefHaccpFormSet(request.POST, prefix='referencia_set')  # 👈 corrección aquí
         if haccp_form.is_valid() and formset.is_valid():
             haccp = haccp_form.save()
             for ref_form in formset:
@@ -394,7 +411,7 @@ def crear_haccp(request):
                     ref = ref_form.save(commit=False)
                     ref.haccp_list = haccp
                     ref.save()
-                    print(f"Referencia guardada: {ref.texto}")  # Para depuración
+                    print(f"Referencia guardada: {ref.texto}")
             return redirect('lista_haccp')
         else:
             print("Errores en formularios:")
@@ -402,7 +419,8 @@ def crear_haccp(request):
             print(formset.errors)
     else:
         haccp_form = HaccpForm()
-        formset = RefFormSet(queryset=Ref_haccp.objects.none(), prefix='referencia_set')
+        formset = RefHaccpFormSet(queryset=Ref_haccp.objects.none(), prefix='referencia_set')
+
     return render(request, 'questions/crear_haccp.html', {
         'haccp_form': haccp_form,
         'formset': formset
@@ -416,13 +434,12 @@ def eliminar_haccp(request, pk):
         return redirect('lista_haccp')
     return render(request, 'questions/confirmar_eliminacion_haccp.html', {'haccp': haccp})
 
-
 #Views No Conformidades
 @superuser_required
 def crear_nc(request):
     if request.method == 'POST':
         nc_form = NcForm(request.POST)
-        formset = RefFormSet(request.POST, prefix='referencia_set')
+        formset = RefNcFormSet(request.POST, prefix='referencia_set')
         if nc_form.is_valid() and formset.is_valid():
             nc = nc_form.save()
             for ref_form in formset:
@@ -438,7 +455,7 @@ def crear_nc(request):
             print(formset.errors)
     else:
         nc_form = NcForm()
-        formset = RefFormSet(queryset=Ref_haccp.objects.none(), prefix='referencia_set')
+        formset = RefNcFormSet(queryset=Ref_noconformidades.objects.none(), prefix='referencia_set')
     return render(request, 'questions/crear_nc.html', {
         'nc_form': nc_form,
         'formset': formset
@@ -471,4 +488,96 @@ def eliminar_nc(request, pk):
         nc.delete()
         return redirect('lista_nc')
     return render(request, 'questions/confirmar_eliminacion_nc.html', {'nc': nc})
+
+# Funciones de Análisis de agua
+def listar_analisis(request):
+    muestras = MuestraAgua.objects.all()
+    resultados = ResultadoAnalisisAgua.objects.all()
+    # Filtrado
+    if request.method == "GET":
+        fecha = request.GET.get('fecha')
+        planta_id = request.GET.get('planta')
+        tipo_analisis_id = request.GET.get('tipo_analisis')
+        resultado = request.GET.get('resultado')
+        if fecha:
+            muestras = muestras.filter(fecha_muestreo=fecha)
+        if planta_id:
+            muestras = muestras.filter(planta_industrial_id=planta_id)
+        if tipo_analisis_id:
+            muestras = muestras.filter(tipo_analisis_id=tipo_analisis_id)
+        if resultado:
+            resultados_ids = ResultadoAnalisisAgua.objects.filter(resultado=resultado).values_list('acta_id', flat=True)
+            muestras = muestras.filter(id__in=resultados_ids)
+     # Paginación
+    paginator = Paginator(muestras, 10)  # 10 muestras por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    plantas = PlantaIndustrial.objects.all()
+    tipos_analisis = TipoAnalisisAgua.objects.all()
+    context = {
+        'muestras': muestras,
+        'plantas': plantas,
+        'tipos_analisis': tipos_analisis,
+        'resultados': resultados,
+    }
+    return render(request, 'questions/listar_analisis_agua.html', context)
+
+# VISTA PARA MANEJAR INGRESO DE UNIDADES PRODUCTIVAS
+def crear_unidad_productiva(request):
+    if request.method == 'POST':
+        form = UnidadProductivaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_unidades_productivas')
+    else:
+        form = UnidadProductivaForm()
+    return render(request, 'questions/crear_unidad_productiva.html', {'form': form})
+
+def listar_unidades_productivas(request):
+    # Obtener los valores únicos para los filtros
+    codigos = UnidadProductiva.objects.values_list('codigo', flat=True).distinct()
+    razon_social = UnidadProductiva.objects.values_list('razon_social', flat=True).distinct()
+    
+    # Obtener los parámetros de búsqueda
+    codigo_filtro = request.GET.get('codigo')
+    razon_social_filtro = request.GET.get('razon_social')
+    
+    # Filtrar las unidades productivas según los parámetros
+    unidades = UnidadProductiva.objects.all()
+    
+    if codigo_filtro:
+        unidades = unidades.filter(codigo=codigo_filtro)
+    
+    if razon_social_filtro:
+        unidades = unidades.filter(razon_social=razon_social_filtro)
+    context = {
+        'unidades': unidades,
+        'codigos': codigos,
+        'razon_social': razon_social,
+    }
+    
+    return render(request, 'questions/listar_unidades_productivas.html', context)
+
+def editar_unidad_productiva(request, pk):
+    unidad = get_object_or_404(UnidadProductiva, pk=pk)
+    
+    if request.method == 'POST':
+        form = UnidadProductivaForm(request.POST, instance=unidad)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Unidad productiva actualizada con éxito.')
+            return redirect('listar_unidades_productivas')  # Redirige a la lista después de guardar
+    else:
+        form = UnidadProductivaForm(instance=unidad)
+    return render(request, 'questions/editar_unidad_productiva.html', {'form': form, 'unidad': unidad})
+
+def eliminar_unidad_productiva(request, pk):
+    unidad = get_object_or_404(UnidadProductiva, pk=pk)
+    if request.method == 'POST':
+        unidad.delete()
+        messages.success(request, 'Unidad productiva eliminada con éxito.')
+        return redirect('listar_unidades_productivas')  # Redirige a la lista después de eliminar
+    return render(request, 'questions/confirmar_eliminacion_unidad_productiva.html', {'unidad': unidad})
+
 

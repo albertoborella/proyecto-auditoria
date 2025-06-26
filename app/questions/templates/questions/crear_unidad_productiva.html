@@ -1,0 +1,49 @@
+{% extends 'questions/base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+<div style="background-color: #146e6c; min-height: 100vh; padding: 20px;">
+    <div class="container py-4">
+        <div class="bg-white p-5 rounded shadow-sm">
+            <h2 class="mb-4" style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: #333;">
+                Registrar Unidad Productiva
+            </h2>
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">{{ form.codigo.label }}</label>
+                    {{ form.codigo|add_class:"form-control" }}
+                    {{ form.codigo.errors }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.razon_social.label }}</label>
+                    {{ form.razon_social|add_class:"form-control" }}
+                    {{ form.razon_social.errors }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.renspa.label }}</label>
+                    {{ form.renspa|add_class:"form-control" }}
+                    {{ form.renspa.errors }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.telefono.label }}</label>
+                    {{ form.telefono|add_class:"form-control" }}
+                    {{ form.telefono.errors }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.email.label }}</label>
+                    {{ form.email|add_class:"form-control" }}
+                    {{ form.email.errors }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.ubicacion.label }}</label>
+                    {{ form.ubicacion|add_class:"form-control" }}
+                    {{ form.ubicacion.errors }}
+                </div>
+                <button type="submit" class="btn btn-outline-primary">Guardar</button>
+                <button class="btn btn-outline-success"><a href="{% url 'listar_unidades_productivas' %}" class="text-decoration-none text-dark">Cancelar</a></button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

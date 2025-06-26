@@ -1,5 +1,14 @@
 from django.urls import path
-from .views import home, crear_auditoria, checklist_auditoria, resultado_auditoria,lista_auditorias, eliminar_auditoria, resultado_auditoria_pdf, obtener_preguntas_por_checklist, modulo_construccion, lista_ppr, crear_ppr, editar_ppr, eliminar_ppr, listado_normas, agregar_norma,lista_haccp, crear_haccp, eliminar_haccp, lista_nc, crear_nc, eliminar_nc
+from .views import (home, crear_auditoria, checklist_auditoria, resultado_auditoria,
+                    lista_auditorias, eliminar_auditoria, resultado_auditoria_pdf, 
+                    obtener_preguntas_por_checklist, modulo_construccion, 
+                    lista_ppr, crear_ppr, eliminar_ppr, 
+                    listado_normas, agregar_norma,
+                    lista_haccp, crear_haccp, eliminar_haccp, 
+                    lista_nc, crear_nc, eliminar_nc,
+                    listar_analisis, 
+                    crear_unidad_productiva, listar_unidades_productivas,
+                    editar_unidad_productiva, eliminar_unidad_productiva)
 
 urlpatterns = [
     path('', home, name='home' ),
@@ -22,4 +31,10 @@ urlpatterns = [
     path('nc/lista/', lista_nc, name='lista_nc'),
     path('nc/crear/', crear_nc, name='crear_nc'),
     path('nc/<int:pk>/eliminar/', eliminar_nc, name='eliminar_nc'),
+    path('listarAnalisisAgua/', listar_analisis, name='listar_analisis_agua'),
+    path('crearUnidadProductiva/', crear_unidad_productiva, name='crear_unidad_productiva'),
+    path('listarUnidadesProductivas/', listar_unidades_productivas, name='listar_unidades_productivas'),
+    path('editarUnidadProductiva/<int:pk>/', editar_unidad_productiva, name='editar_unidad_productiva'),
+    path('eliminarUnidadProductiva/<int:pk>', eliminar_unidad_productiva, name='eliminar_unidad_productiva'),
 ]
+

@@ -129,7 +129,8 @@ class Respuesta(models.Model):
             'resultado_aceptable': porcentaje_obtenido >= 75,
             'porcentaje_obtenido': round(porcentaje_obtenido, 2),
         }
-    
+
+
 # models para referencias normativas y prerrequisitos
 class Ppr(models.Model):
     numero = models.CharField(max_length=5)
@@ -146,7 +147,8 @@ class Referencia(models.Model):
 
     def __str__(self):
         return self.texto
-    
+
+
 class TipoNorma(models.Model):
     nombre = models.CharField(max_length=100)
     class Meta:
@@ -174,8 +176,9 @@ class Norma(models.Model):
     class Meta:
         ordering = ['seccion']
     def __str__(self):
-        return f"{self.tipo_norma}/{self.numero_norma}"
-    
+        return f"{self.tipo_norma} - {self.numero_norma}"
+
+
 # Modelos HACCP
 class Haccp(models.Model):
     numero = models.CharField(max_length=5)
@@ -184,22 +187,22 @@ class Haccp(models.Model):
 
     def __str__(self):
         return f"{self.fase} - {self.principio}"
-    
+
 class Ref_haccp(models.Model):
     haccp_list = models.ForeignKey(Haccp, related_name='ref_haccp', on_delete=models.CASCADE)
     texto = models.CharField(max_length=255)
 
     def __str__(self):
         return self.texto
-    
+
 class NoConformidades(models.Model):
     numero = models.CharField(max_length=10)
     seccion = models.TextField(max_length=100, blank=True, null=True)
     nc = models.TextField(max_length=255, blank=True, null=True)
-    
+
     def __str__(self):
         return f"{self.seccion} - {self.nc}"
-    
+
 
 class Ref_noconformidades(models.Model):
     nc_lista = models.ForeignKey(NoConformidades, related_name='ref_noconformidades', on_delete=models.CASCADE)
@@ -208,3 +211,93 @@ class Ref_noconformidades(models.Model):
     def __str__(self):
         return self.texto
 
+# MODELOS SOBRE CONTROLES
+# AGUA
+class TipoAnalisisAgua(models.Model):
+    nombre = models.CharField(max_length=100)
+    class Meta:
+        ordering = ['nombre']
+    def __str__(self):
+        return self.nombre
+
+
+class PlantaIndustrial(models.Model):
+    nombre = models.CharField(max_length=100)
+    localidadd = models.CharField(max_length=100)
+    direccion = models.CharField(max_length=100)
+        
+    class Meta:
+        ordering = ['nombre']
+
+    def __str__(self):
+        return self.nombre
+
+
+class MuestraAgua(models.Model):
+    planta_industrial = models.ForeignKey(PlantaIndustrial, on_delete=models.CASCADE)
+    fecha_muestreo = models.DateField()
+    lugar_muestreo = models.CharField(max_length=100)
+    responsable = models.CharField(max_length=100)
+    acta_numero = models.CharField(max_length=10)
+    tipo_analisis = models.ForeignKey(TipoAnalisisAgua, on_delete=models.CASCADE)
+    laboratorio = models.CharField(max_length=100)
+    observaciones = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.acta_numero} - {self.lugar_muestreo}"
+
+
+class ResultadoAnalisisAgua(models.Model):
+    choice_resultados = [
+        ('A', 'Aceptable'),
+        ('NA', 'No Aceptable'),
+    ]
+    acta_id = models.ForeignKey(MuestraAgua, on_delete=models.CASCADE)
+    resultado = models.CharField(max_length=2, choices=choice_resultados)
+    observaciones = models.TextField(blank=True, null=True)
+    protocolo_pdf = models.FileField(upload_to='analisis_agua/', null=True, blank=True)
+
+    def __str__(self):
+       return f"{self.acta_id.acta_numero} - {self.resultado}" 
+
+
+# MODELOS UNIDAD PRODUCTIVA
+class UnidadProductiva(models.Model):
+    codigo = models.CharField(max_length=10)
+    razon_social = models.CharField(max_length=100)
+    renspa = models.CharField(max_length=100, blank=True, null=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    ubicacion = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"Unidad Productiva {self.codigo} - {self.razon_social}"
+
+
+# MODELOS RESIDUOS EN LECHE CRUDA
+class Analito(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+    
+    
+class MuestraLeche(models.Model):
+    fecha = models.DateField()
+    unidad_productiva = models.ForeignKey(UnidadProductiva, on_delete=models.CASCADE)
+    volumen_litros = models.DecimalField(max_digits=6, decimal_places=2)
+
+    def __str__(self):
+        return f"Muestra {self.id} - {self.fecha} - {self.unidad_productiva}"
+
+
+class InvestigacionAnalitica(models.Model):
+    muestra = models.ForeignKey(MuestraLeche, on_delete=models.CASCADE, related_name='investigaciones')
+    analito = models.ForeignKey(Analito, on_delete=models.CASCADE)
+    numero_acta = models.CharField(max_length=50)
+    protocolo = models.FileField(upload_to='protocolos/', blank=True, null=True)
+    detectado = models.BooleanField()
+    fecha_resultado = models.DateField()
+
+    def __str__(self):
+        return f"{self.muestra} - {self.analito} - Acta {self.numero_acta}"

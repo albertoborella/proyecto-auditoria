@@ -1,0 +1,111 @@
+{% extends 'questions/base.html' %}
+{% load static %}
+{% block content %}
+<div style="background-color: #146e6c; min-height: 100vh">
+  <div class="container py-4">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+      <h2 class="mb-4 text-center" style="font-family: 'Montserrat', sans-serif; font-weight: 600">
+        Análisis de Agua
+      </h2>
+      <div class="d-flex justify-content-center align-items-center mb-4">
+        <form method="get" class="d-flex align-items-center">
+          <div class="input-group me-2">
+            <input
+              type="date"
+              name="fecha"
+              class="form-control"
+              placeholder="Fecha"
+            />
+          </div>
+          <div class="input-group me-2">
+            <select name="planta" class="form-select">
+              <option value="">Seleccione Planta</option>
+              {% for planta in plantas %}
+              <option value="{{ planta.id }}">{{ planta.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="input-group me-2">
+            <select name="tipo_analisis" class="form-select">
+              <option value="">Seleccione Tipo de Análisis</option>
+              {% for tipo in tipos_analisis %}
+              <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="input-group me-2">
+            <select name="resultado" class="form-select">
+              <option value="">Seleccione Resultado</option>
+              <option value="A">Aceptable</option>
+              <option value="NA">No Aceptable</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-outline-primary btn-sm ms-2">Buscar</button>
+        </form>
+        {% if user.is_authenticated and user.is_superuser %}
+        <a href="#" class="btn btn-outline-success btn-sm ms-2">
+          + Nuevo análisis
+        </a>
+        {% endif %}
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle table-sm small">
+          <thead class="table-primary text-center">
+            <tr>
+              <th>Acta Número</th>
+              <th>Planta Industrial</th>
+              <th>Fecha de Muestreo</th>
+              <th>Tipo de Análisis</th>
+              <th>Resultado</th>
+              <th>Protocolo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for muestra in muestras %}
+            <tr>
+              <td>{{ muestra.acta_numero }}</td>
+              <td>{{ muestra.planta_industrial.nombre }}</td>
+              <td>{{ muestra.fecha_muestreo }}</td>
+              <td>{{ muestra.tipo_analisis.nombre }}</td>
+              <td class="text-center"> <!-- Centrar el contenido -->
+                    {% with resultado=muestra.resultadoanalisisagua_set.first %}
+                        {% if resultado %}
+                            {% if resultado.resultado == 'A' %}
+                                <i class="fas fa-check-circle" style="color: green;" title="Aceptable"></i>
+                            {% elif resultado.resultado == 'NA' %}
+                                <i class="fas fa-times-circle" style="color: red;" title="No Aceptable"></i>
+                            {% endif %}
+                            {% if resultado.observaciones %} 
+                                ({{ resultado.observaciones }}) 
+                            {% endif %}
+                        {% else %}
+                            No disponible
+                        {% endif %}
+                    {% endwith %}
+                </td>
+              <td class="text-center>
+                    {% with resultado=muestra.resultadoanalisisagua_set.first %}
+                        {% if resultado.protocolo_pdf %}
+                            <a href="{{ resultado.protocolo_pdf.url }}" target="_blank" class="text-decoration-none">
+                                <div class="d-flex justify-content-center">
+                                    <i class="bi bi-file-earmark-pdf" style="color: red;"></i> <!-- Usar un ícono de PDF -->
+                                </div>
+                            </a>
+                        {% else %}
+                            No disponible
+                        {% endif %}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center">No se encontraron análisis.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

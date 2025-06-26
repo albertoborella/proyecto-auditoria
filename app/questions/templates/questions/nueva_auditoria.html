@@ -9,29 +9,24 @@
             font-family: 'Montserrat', sans-serif;
             font-size: 2.8rem;
             font-weight: 600;
-            color: white;
+            color: rgb(255, 255, 255);
             text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
             letter-spacing: 1px;
             padding-top: 40px;
         ">
-            REGISTRO AUDITORIA
+            REGISTRO NUEVA AUDITORIA
         </h1>
     </div>
 </div>
-
-<div class="container mt-4" style="max-width: 720px;">
-    <div class="bg-white p-4 rounded-4 shadow-sm">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0" style="font-family: 'Montserrat', sans-serif;">Nueva Auditoría</h2>
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">Cancelar</a>
-        </div>
-
+<div style="background-color: #146e6c">
+<div class="container" style="max-width: 720px;padding-top: 20px;">
+    <div class="bg-white p-4 rounded-4 shadow-sm ">
         <form method="post" class="w-100">
             {% csrf_token %}
             <div class="row g-3">
                 {% for field in form %}
                 <div class="col-md-6">
-                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold" style="font-size: 0.9rem;">
+                    <label for="{{ field.id_for_label }}" class="form-label" style="font-size: 0.8rem;">
                         {{ field.label }}
                     </label>
                     {{ field|add_class:"form-control form-control-sm" }}
@@ -47,12 +42,14 @@
             </div>
 
             <div class="d-flex justify-content-end">
-                <button id="btn-crear" type="submit" class="btn btn-primary btn-sm px-4 mt-2" disabled>
+                <button id="btn-crear" type="submit" class="btn btn-primary btn-sm px-4 mt-2" style="margin-right: 8px;" disabled>
                     Crear Auditoría
                 </button>
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm px-4 mt-2" style="margin-right: 8px;">Cancelar</a>
             </div>
         </form>
     </div>
+</div>
 </div>
 
 {% endblock %}
