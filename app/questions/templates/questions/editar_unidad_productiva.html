@@ -1,13 +1,38 @@
 {% extends 'questions/base.html' %}
 {% load static %}
 {% block content %}
-<div class="container py-4">
-    <h2 class="mb-4">Editar Unidad Productiva</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-    </form>
-    <a href="{% url 'listar_unidades_productivas' %}" class="btn btn-secondary mt-3">Cancelar</a>
+<div style="background-color: #146e6c; min-height: 100vh">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <!-- Columna izquierda: Muestra de Agua -->
+                                <div class="col-md-12 mb-4">
+                                    <div class="card shadow-sm">
+                                        <div class="card-body">
+                                            <h3 class="card-title text-center mb-4"
+                                                style="font-family: 'Times New Roman', Times, serif;">
+                                                Editar Unidad Productiva
+                                            </h3>
+                                            {{ form.as_p }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                            <a href="{% url 'listar_unidades_productivas' %}" class="btn btn-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}
