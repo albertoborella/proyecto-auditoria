@@ -43,7 +43,7 @@
           <button type="submit" class="btn btn-outline-primary btn-sm ms-2">Buscar</button>
         </form>
         {% if user.is_authenticated and user.is_superuser %}
-        <a href="#" class="btn btn-outline-success btn-sm ms-2">
+        <a href="{% url 'crear_muestra_agua' %}" class="btn btn-outline-success btn-sm ms-2">
           + Nuevo análisis
         </a>
         {% endif %}
@@ -58,6 +58,7 @@
               <th>Tipo de Análisis</th>
               <th>Resultado</th>
               <th>Protocolo</th>
+              <th>Acciones</th> <!-- Nueva columna para acciones -->
             </tr>
           </thead>
           <tbody>
@@ -83,7 +84,7 @@
                         {% endif %}
                     {% endwith %}
                 </td>
-              <td class="text-center>
+              <td class="text-center">
                     {% with resultado=muestra.resultadoanalisisagua_set.first %}
                         {% if resultado.protocolo_pdf %}
                             <a href="{{ resultado.protocolo_pdf.url }}" target="_blank" class="text-decoration-none">
@@ -96,10 +97,15 @@
                         {% endif %}
                     {% endwith %}
                 </td>
+              <td class="text-center"> <!-- Columna para editar -->
+                <a href="{% url 'editar_muestra_agua' muestra.id %}" class="text-decoration-none" title="Editar">
+                  <i class="fas fa-edit" style="color: blue;"></i> <!-- Ícono de editar -->
+                </a>
+              </td>
             </tr>
             {% empty %}
             <tr>
-              <td colspan="5" class="text-center">No se encontraron análisis.</td>
+              <td colspan="7" class="text-center">No se encontraron análisis.</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -109,3 +115,4 @@
   </div>
 </div>
 {% endblock %}
+

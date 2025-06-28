@@ -1,0 +1,69 @@
+{% extends 'questions/base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+<div style="background-color: #146e6c; min-height: 100vh">
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-md-12 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <!-- {% if muestra_id %}
+            <h3 class="card-title">Editar Muestra de Agua</h3>
+            {% else %}
+            <h3 class="card-title">Registrar Muestra de Agua</h3>
+            {% endif %} -->
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="row">
+                <!-- Columna izquierda: Muestra de Agua -->
+                <div class="col-md-6 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h3 class="card-title text-center mb-4" style="font-family: 'Times New Roman', Times, serif;">
+                        {% if muestra_id %} Editar Muestra de Agua {% else %} Registrar Muestra de Agua {% endif %}
+                      </h3>
+
+                      {{ form.non_field_errors }}
+                      {% for field in form %}
+                      <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {{ field.errors }}
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Columna derecha: Resultado del análisis -->
+                <div class="col-md-6 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h3 class="card-title text-center mb-4" style="font-family: 'Times New Roman', Times, serif;">Resultado del Análisis de Agua</h3>
+
+                      {{ resultado_form.non_field_errors }}
+                      {% for field in resultado_form %}
+                      <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {{ field.errors }}
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones generales -->
+              <button type="submit" class="btn btn-success">Guardar Todo</button>
+              <a href="{% url 'listar_analisis_agua' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

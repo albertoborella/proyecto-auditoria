@@ -2,15 +2,22 @@
 {% load static %}
 {% load custom_filters %}
 {% block content %}
-<div style="background-color: #146e6c; min-height: 100vh; padding: 20px;">
-    <div class="container py-4">
-        <div class="bg-white p-5 rounded shadow-sm">
-            <h2 class="mb-4" style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: #333;">
-                Registrar Unidad Productiva
-            </h2>
+<div style="background-color: #146e6c; min-height: 100vh">
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
             <form method="post" class="needs-validation" novalidate>
                 {% csrf_token %}
-                <div class="mb-3">
+                <div class="row">
+                <div class="col-md-12 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4" style="font-family: 'Times New Roman', Times, serif;">
+                        Registrar Unidad Productiva
+                      </h3>
+                      <div class="mb-3">
                     <label class="form-label">{{ form.codigo.label }}</label>
                     {{ form.codigo|add_class:"form-control" }}
                     {{ form.codigo.errors }}
@@ -40,8 +47,12 @@
                     {{ form.ubicacion|add_class:"form-control" }}
                     {{ form.ubicacion.errors }}
                 </div>
-                <button type="submit" class="btn btn-outline-primary">Guardar</button>
-                <button class="btn btn-outline-success"><a href="{% url 'listar_unidades_productivas' %}" class="text-decoration-none text-dark">Cancelar</a></button>
+                  </div>
+                </div>
+                
+                <button type="submit" class="btn btn-outline-primary" style="margin-right: 4px; margin-top: 6px;">Guardar</button>
+                <button class="btn btn-outline-success" style="margin-right: 4px; margin-top: 6px;"><a href="{% url 'listar_unidades_productivas' %}" class="text-decoration-none text-dark">Cancelar</a></button>
+                </div>
             </form>
         </div>
     </div>

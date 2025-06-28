@@ -26,6 +26,7 @@ from .forms import (
     NcForm,
     Ref_noconformidadesForm,
     UnidadProductivaForm,
+    MuestraAguaForm, ResultadoAnalisisAguaForm
 )
 
 from .models import (Auditoria, PreguntaPredefinida, Respuesta, Checklist,
@@ -490,6 +491,48 @@ def eliminar_nc(request, pk):
     return render(request, 'questions/confirmar_eliminacion_nc.html', {'nc': nc})
 
 # Funciones de Análisis de agua
+def crear_y_editar_muestra_agua(request, muestra_id=None):
+    muestra = get_object_or_404(MuestraAgua, id=muestra_id) if muestra_id else None
+    resultado = ResultadoAnalisisAgua.objects.filter(acta_id=muestra).first() if muestra else None
+
+    if request.method == 'POST':
+        form = MuestraAguaForm(request.POST, request.FILES, instance=muestra)
+        resultado_form = ResultadoAnalisisAguaForm(request.POST, request.FILES, instance=resultado)
+
+        if form.is_valid():
+            muestra = form.save()
+
+    # Solo procesar resultado si se completaron datos
+            if any([
+                request.POST.get('resultado'),
+                request.POST.get('observaciones'),
+                request.FILES.get('protocolo_pdf'),
+            ]):
+                if resultado_form.is_valid():
+                    resultado_data = resultado_form.cleaned_data
+                    resultado = resultado_form.save(commit=False)
+                    resultado.acta_id = muestra
+                    resultado.save()
+
+            return redirect('listar_analisis_agua')  # Redirige al listado si todo va bien
+
+        else:
+            print("Errores en el formulario:")
+            print(form.errors)
+            print(resultado_form.errors)
+
+    else:
+        form = MuestraAguaForm(instance=muestra)
+        resultado_form = ResultadoAnalisisAguaForm(instance=resultado)
+
+    return render(request, 'questions/crear_y_editar_muestra_agua.html', {
+        'form': form,
+        'resultado_form': resultado_form,
+        'muestra_id': muestra_id,
+    })
+
+
+
 def listar_analisis(request):
     muestras = MuestraAgua.objects.all()
     resultados = ResultadoAnalisisAgua.objects.all()

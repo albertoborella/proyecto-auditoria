@@ -6,7 +6,7 @@ from .views import (home, crear_auditoria, checklist_auditoria, resultado_audito
                     listado_normas, agregar_norma,
                     lista_haccp, crear_haccp, eliminar_haccp, 
                     lista_nc, crear_nc, eliminar_nc,
-                    listar_analisis, 
+                    listar_analisis, crear_y_editar_muestra_agua,
                     crear_unidad_productiva, listar_unidades_productivas,
                     editar_unidad_productiva, eliminar_unidad_productiva)
 
@@ -31,7 +31,11 @@ urlpatterns = [
     path('nc/lista/', lista_nc, name='lista_nc'),
     path('nc/crear/', crear_nc, name='crear_nc'),
     path('nc/<int:pk>/eliminar/', eliminar_nc, name='eliminar_nc'),
-    path('listarAnalisisAgua/', listar_analisis, name='listar_analisis_agua'),
+    
+    path('listar_analisis_agua/', listar_analisis, name='listar_analisis_agua'),
+    path('muestra_agua/', crear_y_editar_muestra_agua, name='crear_muestra_agua'),
+    path('muestra_agua_editar/<int:muestra_id>/', crear_y_editar_muestra_agua, name='editar_muestra_agua'),
+    
     path('crearUnidadProductiva/', crear_unidad_productiva, name='crear_unidad_productiva'),
     path('listarUnidadesProductivas/', listar_unidades_productivas, name='listar_unidades_productivas'),
     path('editarUnidadProductiva/<int:pk>/', editar_unidad_productiva, name='editar_unidad_productiva'),

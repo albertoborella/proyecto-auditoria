@@ -3,7 +3,7 @@ from django.forms import inlineformset_factory, modelformset_factory
 from .models import ( Auditoria, Ppr, Referencia, Norma, 
                      Haccp, Ref_haccp, NoConformidades, 
                      Ref_noconformidades, UnidadProductiva, 
-                     UnidadProductiva )
+                     MuestraAgua, ResultadoAnalisisAgua )
 
 class AuditoriaForm(forms.ModelForm):
     class Meta:
@@ -187,3 +187,52 @@ class UnidadProductivaForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el email'}),
             'ubicacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la ubicación'}),
         }
+
+# FORMULARIO PARA CARGA DE DATOS DE CONTROL DE AGUA
+class MuestraAguaForm(forms.ModelForm):
+    class Meta:
+        model = MuestraAgua
+        fields = [
+            'planta_industrial',
+            'fecha_muestreo',
+            'lugar_muestreo',
+            'responsable',
+            'acta_numero',
+            'tipo_analisis',
+            'laboratorio',
+            # 'observaciones',
+        ]
+        widgets = {
+            'planta_industrial': forms.Select(attrs={'class': 'form-control'}),
+            'fecha_muestreo': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'readonly': 'readonly',  # impide que se edite al cargar
+            },
+            format='%Y-%m-%d'
+            ),
+            
+            'lugar_muestreo': forms.TextInput(attrs={'class': 'form-control'}),
+            'responsable': forms.TextInput(attrs={'class': 'form-control'}),
+            'acta_numero': forms.TextInput(attrs={'class': 'form-control'}),
+            'tipo_analisis': forms.Select(attrs={'class': 'form-control'}),
+            'laboratorio': forms.TextInput(attrs={'class': 'form-control'}),
+            # 'observaciones': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
+        }
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            if self.instance and self.instance.fecha_muestreo:
+                self.fields['fecha_muestreo'].initial = self.instance.fecha_muestreo.strftime('%Y-%m-%d')
+
+class ResultadoAnalisisAguaForm(forms.ModelForm):
+    class Meta:
+        model = ResultadoAnalisisAgua
+        fields = ['resultado', 'protocolo_pdf', 'observaciones']  # Asegúrate de incluir los campos correctos
+        widgets = {
+            'resultado': forms.Select(attrs={'class': 'form-control'}),
+            'observaciones': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),  # Establecer 2 filas
+        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
