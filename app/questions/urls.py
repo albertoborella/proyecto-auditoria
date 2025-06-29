@@ -8,7 +8,9 @@ from .views import (home, crear_auditoria, checklist_auditoria, resultado_audito
                     lista_nc, crear_nc, eliminar_nc,
                     listar_analisis, crear_y_editar_muestra_agua,
                     crear_unidad_productiva, listar_unidades_productivas,
-                    editar_unidad_productiva, eliminar_unidad_productiva)
+                    editar_unidad_productiva, eliminar_unidad_productiva,
+                    registro_muestra, detalle_muestra, editar_analito, listado_analisis,
+                    )
 
 urlpatterns = [
     path('', home, name='home' ),
@@ -40,5 +42,12 @@ urlpatterns = [
     path('listarUnidadesProductivas/', listar_unidades_productivas, name='listar_unidades_productivas'),
     path('editarUnidadProductiva/<int:pk>/', editar_unidad_productiva, name='editar_unidad_productiva'),
     path('eliminarUnidadProductiva/<int:pk>', eliminar_unidad_productiva, name='eliminar_unidad_productiva'),
+
+    path('registro/', registro_muestra, name='registro_muestra'),
+    path('registro/<int:muestra_id>/', registro_muestra, name='registro_muestra'),
+    path('muestras/<int:pk>/', detalle_muestra, name='detalle_muestra'),
+    path('analito/<int:pk>/editar/', editar_analito, name='editar_analito'),
+    path('analisis/listado/', listado_analisis, name='listado_analisis'),
+
 ]
 

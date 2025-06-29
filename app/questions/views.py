@@ -26,14 +26,15 @@ from .forms import (
     NcForm,
     Ref_noconformidadesForm,
     UnidadProductivaForm,
-    MuestraAguaForm, ResultadoAnalisisAguaForm
+    MuestraAguaForm, ResultadoAnalisisAguaForm,
+    MuestraLecheForm, InvestigacionAnaliticaForm
 )
 
 from .models import (Auditoria, PreguntaPredefinida, Respuesta, Checklist,
                      Ppr, Referencia, Cliente, Norma, TipoSeccion, 
                      Haccp, Ref_haccp, NoConformidades, Ref_noconformidades, 
                      MuestraAgua, ResultadoAnalisisAgua, PlantaIndustrial, TipoAnalisisAgua,
-                     UnidadProductiva)
+                     UnidadProductiva, MuestraLeche, Analito, InvestigacionAnalitica)
 
 
 def superuser_required(view_func):
@@ -622,5 +623,100 @@ def eliminar_unidad_productiva(request, pk):
         messages.success(request, 'Unidad productiva eliminada con éxito.')
         return redirect('listar_unidades_productivas')  # Redirige a la lista después de eliminar
     return render(request, 'questions/confirmar_eliminacion_unidad_productiva.html', {'unidad': unidad})
+
+# VISTAS PARA REGISTRAR MUESTRAS DE LECHE CRUDA Y ANALISIS DE RESIDUOS
+def registro_muestra(request, muestra_id=None):
+    muestra = MuestraLeche.objects.filter(id=muestra_id).first()
+    analitos = muestra.investigaciones.all() if muestra else None
+
+    if not muestra:
+        if request.method == 'POST':
+            form = MuestraLecheForm(request.POST)
+            if form.is_valid():
+                nueva = form.save()
+                return redirect('registro_muestra', muestra_id=nueva.id)
+        else:
+            form = MuestraLecheForm()
+        return render(request, 'residuos_leche/registro_muestra.html', {
+            'muestra_form': form,
+            'muestra': None
+        })
+
+    else:
+        if request.method == 'POST':
+            form = InvestigacionAnaliticaForm(request.POST, request.FILES)
+            if form.is_valid():
+                analito = form.save(commit=False)
+                analito.muestra = muestra
+                analito.save()
+                if 'add_another' in request.POST:
+                    return redirect('registro_muestra', muestra_id=muestra.id)
+                return redirect('detalle_muestra', pk=muestra.id)
+        else:
+            form = InvestigacionAnaliticaForm()
+
+        return render(request, 'residuos_leche/registro_muestra.html', {
+            'muestra': muestra,
+            'muestra_form': None,
+            'analito_form': form,
+            'analitos': analitos
+        })
+
+def detalle_muestra(request, pk):
+    muestra = get_object_or_404(MuestraLeche, pk=pk)
+    analitos = muestra.investigaciones.all()
+
+    return render(request, 'residuos_leche/detalle_muestra.html', {
+        'muestra': muestra,
+        'analitos': analitos
+    })
+
+def editar_analito(request, pk):
+    analito = get_object_or_404(InvestigacionAnalitica, pk=pk)
+    if request.method == 'POST':
+        form = InvestigacionAnaliticaForm(request.POST, request.FILES, instance=analito)
+        if form.is_valid():
+            form.save()
+            return redirect('detalle_muestra', pk=analito.muestra.pk)
+    else:
+        form = InvestigacionAnaliticaForm(instance=analito)
+
+    return render(request, 'residuos_leche/editar_analito.html', {
+        'form': form,
+        'analito': analito,
+    })
+
+def listado_analisis(request):
+    analitos = Analito.objects.all()
+    query = InvestigacionAnalitica.objects.select_related('muestra', 'analito')
+
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+    codigo_muestra = request.GET.get('codigo_muestra')
+    analito_id = request.GET.get('analito')
+
+    filtros = {}
+
+    if fecha_inicio:
+        query = query.filter(muestra__fecha__gte=fecha_inicio)
+        filtros['fecha_inicio'] = fecha_inicio
+
+    if fecha_fin:
+        query = query.filter(muestra__fecha__lte=fecha_fin)
+        filtros['fecha_fin'] = fecha_fin
+
+    if codigo_muestra:
+        query = query.filter(muestra__codigo_muestra__icontains=codigo_muestra)
+        filtros['codigo_muestra'] = codigo_muestra
+
+    if analito_id:
+        query = query.filter(analito__id=analito_id)
+        filtros['analito'] = analito_id
+
+    return render(request, 'residuos_leche/listado_analisis.html', {
+        'analisis': query,
+        'analitos': analitos,
+        'filtros': filtros
+    })
 
 

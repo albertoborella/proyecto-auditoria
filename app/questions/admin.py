@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import PreguntaPredefinida, Cliente, Auditor, Auditoria, Respuesta, Checklist, Ppr, Referencia, Norma, TipoNorma, TipoSeccion, Haccp, Ref_haccp, NoConformidades, Ref_noconformidades, TipoAnalisisAgua, PlantaIndustrial, MuestraAgua, ResultadoAnalisisAgua
+from .models import (PreguntaPredefinida, Cliente, Auditor, Auditoria, Respuesta, Checklist, 
+                    Ppr, Referencia, Norma, TipoNorma, TipoSeccion, 
+                    Haccp, Ref_haccp, NoConformidades, Ref_noconformidades, 
+                    TipoAnalisisAgua, PlantaIndustrial, MuestraAgua, ResultadoAnalisisAgua,
+                    Analito, MuestraLeche, InvestigacionAnalitica)
 
 @admin.register(PreguntaPredefinida)
 class PreguntaPredefinidaAdmin(admin.ModelAdmin):
@@ -12,11 +16,14 @@ class ChecklistAdmin(admin.ModelAdmin):
     list_display = ('nombre',)
     search_fields = ('nombre',)
 
+admin.site.register(Analito)
 admin.site.register(Auditor)
 admin.site.register(Auditoria)
 admin.site.register(Checklist, ChecklistAdmin)
 admin.site.register(Cliente)
 admin.site.register(Haccp)
+admin.site.register(InvestigacionAnalitica)
+admin.site.register(MuestraLeche)
 admin.site.register(Norma)
 admin.site.register(NoConformidades)
 admin.site.register(Ppr)

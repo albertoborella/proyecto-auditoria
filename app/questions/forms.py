@@ -3,7 +3,8 @@ from django.forms import inlineformset_factory, modelformset_factory
 from .models import ( Auditoria, Ppr, Referencia, Norma, 
                      Haccp, Ref_haccp, NoConformidades, 
                      Ref_noconformidades, UnidadProductiva, 
-                     MuestraAgua, ResultadoAnalisisAgua )
+                     MuestraAgua, ResultadoAnalisisAgua,
+                     MuestraLeche, InvestigacionAnalitica, )
 
 class AuditoriaForm(forms.ModelForm):
     class Meta:
@@ -235,4 +236,58 @@ class ResultadoAnalisisAguaForm(forms.ModelForm):
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+# FORMULARIO PARA REGISTRO DE MUESTRAS Y ANALISIS DE RESIDUOS EN LECHE
+class MuestraLecheForm(forms.ModelForm):
+    class Meta:
+        model = MuestraLeche
+        fields = ['fecha', 'unidad_productiva', 'volumen_litros', 'codigo_muestra']
+        widgets = {
+            'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'unidad_productiva': forms.Select(attrs={'class': 'form-select'}),
+            'volumen_litros': forms.NumberInput(attrs={'class': 'form-control'}),
+            'codigo_muestra': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class InvestigacionAnaliticaForm(forms.ModelForm):
+    class Meta:
+        model = InvestigacionAnalitica
+        fields = ['analito', 'numero_acta', 'protocolo', 'estado_resultado', 'fecha_resultado']
+        widgets = {
+            'analito': forms.Select(attrs={'class': 'form-select'}),
+            'numero_acta': forms.TextInput(attrs={'class': 'form-control'}),
+            'protocolo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'estado_resultado': forms.Select(attrs={'class': 'form-select'}),
+            'fecha_resultado': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
+
+InvestigacionAnaliticaFormSet = inlineformset_factory(
+    MuestraLeche,
+    InvestigacionAnalitica,
+    form=InvestigacionAnaliticaForm,
+    extra=1,
+    can_delete=True
+)
+
+class InvestigacionAnaliticaForm(forms.ModelForm):
+    class Meta:
+        model = InvestigacionAnalitica
+        fields = ['analito', 'numero_acta', 'protocolo', 'estado_resultado', 'fecha_resultado']
+        widgets = {
+            'analito': forms.Select(attrs={'class': 'form-select'}),
+            'numero_acta': forms.TextInput(attrs={'class': 'form-control'}),
+            'protocolo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'estado_resultado': forms.Select(attrs={'class': 'form-select'}),
+            'fecha_resultado': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(InvestigacionAnaliticaForm, self).__init__(*args, **kwargs)
+        self.fields['protocolo'].required = False
+        self.fields['fecha_resultado'].required = False 
+
+        
 

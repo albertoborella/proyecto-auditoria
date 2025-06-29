@@ -1,0 +1,75 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<div style="background-color: #146e6c; min-height: 100vh">
+  <div class="container py-4">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+      <h3 class="card-title mb-2" style="font-family: 'Times New Roman', Times, serif;">
+        Control de Residuos Químicos en Leche
+      </h3>
+  <div class="card mb-2">
+  <div class="card-body small py-2">
+    <p class="mb-1" style="font-size: 0.90rem;">Fecha: {{ muestra.fecha }}</p>
+    <p class="mb-1" style="font-size: 0.90rem;">Código del muestreo: {{ muestra.codigo_muestra }}</p>
+    <p class="mb-1" style="font-size: 0.90rem;">Unidad productiva: {{ muestra.unidad_productiva }}</p>
+    <p class="mb-1" style="font-size: 0.90rem;">Volumen recibido: {{ muestra.volumen_litros }} litros</p>
+  </div>
+</div>
+
+
+      <h4 class="card-title mb-2" style="font-family: 'Times New Roman', Times, serif;">
+        Analitos investigados
+      </h4>
+  {% if analitos %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle table-sm small">
+      <thead class="table-primary text-center">
+        <tr>
+          <th>Analito</th>
+          <th>Acta</th>
+          <th>Fecha resultado</th>
+          <th>Resultado</th>
+          <th>Protocolo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in analitos %}
+        <tr>
+          <td>{{ a.analito.nombre }}</td>
+          <td>{{ a.numero_acta }}</td>
+          <td>{{ a.fecha_resultado|default:"Pendiente" }}</td>
+          <td class="text-center">
+            {% if a.estado_resultado == "aceptable" %}
+              <i class="fas fa-check-circle" style="color: green;" title="Aceptable"></i>
+            {% elif a.estado_resultado == "no_aceptable" %}
+              <i class="fas fa-times-circle" style="color: red;" title="No Aceptable"></i>
+            {% else %}
+              <span class="badge bg-warning text-dark">Falta resultado</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if a.protocolo %}
+              <a href="{{ a.protocolo.url }}" target="_blank" class="text-decoration-none">
+                                <div class="d-flex justify-content-center">
+                                    <i class="bi bi-file-earmark-pdf" style="color: red;"></i> <!-- Usar un ícono de PDF -->
+                                </div>
+                            </a>
+            {% else %}
+              <em>Falta protocolo</em>
+            {% endif %}
+          </td>
+          <td class="text-center"> <!-- Columna para editar -->
+                <a href="{% url 'editar_analito' a.pk %}" class="text-decoration-none" title="Editar">
+                  <i class="fas fa-edit" style="color: blue;"></i> <!-- Ícono de editar -->
+                </a>
+              </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  {% else %}
+    <p>No se han cargado analitos aún.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<div style="background-color: #146e6c; min-height: 100vh">
+  <div class="container py-4">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+      <h3 class="card-title mb-4" style="font-family: 'Times New Roman', Times, serif;">
+        Análisis de Residuos Químicos en Leche Cruda
+      </h3>
+
+      <!-- Filtros -->
+<form method="get" class="row row-cols-auto gy-2 gx-3 align-items-center mb-4 justify-content-center">
+  <div class="col">
+    <input type="date" name="fecha_inicio" value="{{ filtros.fecha_inicio }}" class="form-control form-control-sm" placeholder="Desde">
+  </div>
+  <div class="col">
+    <input type="date" name="fecha_fin" value="{{ filtros.fecha_fin }}" class="form-control form-control-sm" placeholder="Hasta">
+  </div>
+  <div class="col">
+    <input type="text" name="codigo_muestra" value="{{ filtros.codigo_muestra }}" class="form-control form-control-sm" placeholder="Código muestra">
+  </div>
+  <div class="col">
+    <select name="analito" class="form-select form-select-sm">
+      <option value="">Analito</option>
+      {% for a in analitos %}
+      <option value="{{ a.id }}" {% if filtros.analito == a.id|stringformat:'s' %}selected{% endif %}>{{ a.nombre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col">
+    <button type="submit" class="btn btn-sm btn-outline-primary">Buscar</button>
+  </div>
+  <div class="col">
+    <a href="{% url 'registro_muestra' %}" class="btn btn-sm btn-outline-success ms-2">
+      + Nueva muestra
+    </a>
+  </div>
+</form>
+
+      <!-- Tabla de resultados -->
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle table-sm small">
+          <thead class="table-primary text-center">
+            <tr>
+              <th>Fecha</th>
+              <th>Código Muestra</th>
+              <th>Analito</th>
+              <th>N° Acta</th>
+              <th>Resultado</th>
+              <th>Protocolo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in analisis %}
+            <tr>
+              <td>{{ a.muestra.fecha }}</td>
+              <td>{{ a.muestra.codigo_muestra }}</td>
+              <td>{{ a.analito.nombre }}</td>
+              <td>{{ a.numero_acta }}</td>
+              <td class="text-center">
+                {% if a.estado_resultado == 'aceptable' %}
+                  <i class="fas fa-check-circle" style="color: green;" title="Aceptable"></i>
+                {% elif a.estado_resultado == 'no_aceptable' %}
+                  <i class="fas fa-times-circle" style="color: red;" title="No Aceptable"></i>
+                {% else %}
+                  <i class="fas fa-exclamation-circle" style="color: orange;" title="Falta resultado"></i>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                {% if a.protocolo %}
+                  <a href="{{ a.protocolo.url }}" target="_blank" class="text-decoration-none">
+                    <i class="bi bi-file-earmark-pdf" style="color: red;"></i>
+                  </a>
+                {% else %}
+                  <em class="text-muted">No disponible</em>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <a href="{% url 'editar_analito' a.pk %}" class="text-decoration-none" title="Editar">
+                  <i class="fas fa-edit" style="color: blue;"></i>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center">No se encontraron análisis.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

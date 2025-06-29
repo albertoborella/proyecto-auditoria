@@ -283,6 +283,7 @@ class Analito(models.Model):
     
     
 class MuestraLeche(models.Model):
+    codigo_muestra = models.CharField(max_length=20, verbose_name='Código de muestreo', blank=True, null=True)
     fecha = models.DateField()
     unidad_productiva = models.ForeignKey(UnidadProductiva, on_delete=models.CASCADE)
     volumen_litros = models.DecimalField(max_digits=6, decimal_places=2)
@@ -292,12 +293,22 @@ class MuestraLeche(models.Model):
 
 
 class InvestigacionAnalitica(models.Model):
+    ESTADO_RESULTADO_CHOICES = [
+        ('aceptable', 'Aceptable'),
+        ('no_aceptable', 'No aceptable'),
+        ('falta', 'Falta resultado'),
+    ]
+
     muestra = models.ForeignKey(MuestraLeche, on_delete=models.CASCADE, related_name='investigaciones')
     analito = models.ForeignKey(Analito, on_delete=models.CASCADE)
     numero_acta = models.CharField(max_length=50)
     protocolo = models.FileField(upload_to='protocolos/', blank=True, null=True)
-    detectado = models.BooleanField()
-    fecha_resultado = models.DateField()
+    estado_resultado = models.CharField(
+        max_length=20,
+        choices=ESTADO_RESULTADO_CHOICES,
+        default='falta'
+    )
+    fecha_resultado = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.muestra} - {self.analito} - Acta {self.numero_acta}"

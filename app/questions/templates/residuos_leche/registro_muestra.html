@@ -1,0 +1,63 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<div style="background-color: #146e6c; min-height: 100vh">
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div>
+              <h3 class="card-title text-center mb-4" style="font-family: 'Times New Roman', Times, serif;">
+                Control de Residuos Químicos en Leche
+              </h3>
+            </div>
+  <!-- Formulario de muestra -->
+  {% if not muestra %}
+  <form method="post">
+    {% csrf_token %}
+    <fieldset class="border rounded-3 p-3 mb-4">
+      <legend class="float-none w-auto px-3 fs-5">Datos de la muestra</legend>
+      {{ muestra_form.as_p }}
+    </fieldset>
+    <button type="submit" class="btn btn-primary">Guardar muestra</button>
+  </form>
+  {% else %}
+  <fieldset class="border rounded-3 p-3 mb-4">
+    <legend class="float-none w-auto px-3 fs-5">Muestra registrada</legend>
+    <p><strong>Fecha:</strong> {{ muestra.fecha }}</p>
+    <p><strong>Código de muestreo:</strong> {{ muestra.codigo_muestra }}</p>
+    <p><strong>Unidad productiva:</strong> {{ muestra.unidad_productiva }}</p>
+    <p><strong>Volumen:</strong> {{ muestra.volumen_litros }} litros</p>
+  </fieldset>
+
+  <hr>
+
+  <!-- Formulario de analitos -->
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset class="border rounded-3 p-3 mb-4">
+      <legend class="float-none w-auto px-3 fs-5">Agregar analito</legend>
+      {{ analito_form.as_p }}
+    </fieldset>
+    <button type="submit" name="add_another" class="btn btn-secondary">Agregar otro analito</button>
+    <button type="submit" class="btn btn-primary">Finalizar</button>
+  </form>
+
+  <!-- Lista de analitos agregados -->
+  {% if analitos %}
+  <hr>
+  <h5 class="mt-4">Analitos cargados</h5>
+  <ul class="list-group">
+    {% for a in analitos %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ a.analito.nombre }} – Acta: {{ a.numero_acta }}
+        {% if a.fecha_resultado %}<span class="badge bg-success">Resultado cargado</span>{% else %}<span class="badge bg-warning text-dark">Pendiente</span>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endif %}
+</div>
+</div>
+</div>
+{% endblock %}
