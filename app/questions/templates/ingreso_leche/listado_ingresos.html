@@ -1,0 +1,110 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<div style="background-color: #146e6c; min-height: 100vh;">
+  <div class="container py-4">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0" style="font-family: 'Times New Roman', Times, serif;">Ingresos de Leche Cruda</h3>
+        <a href="{% url 'ingreso_leche' %}" class="btn btn-sm btn-outline-success">+ Nuevo ingreso</a>
+      </div>
+
+      <!-- <h3 class="mb-3" style="font-family: 'Times New Roman', Times, serif;">Ingresos de leche</h3> -->
+
+      <!-- Filtros -->
+      <form method="get" class="row row-cols-auto gy-2 gx-3 align-items-center mb-4 justify-content-center">
+        <div class="col">
+          <label for="fecha_inicio" class="form-label">Desde</label>
+          <input type="date" id="fecha_inicio" name="fecha_inicio" value="{{ filtros.fecha_inicio }}" class="form-control form-control-sm">
+        </div>
+        <div class="col">
+          <label for="fecha_fin" class="form-label">Hasta</label>
+          <input type="date" id="fecha_fin" name="fecha_fin" value="{{ filtros.fecha_fin }}" class="form-control form-control-sm">
+        </div>
+        <div class="col">
+          <label for="unidad_productiva" class="form-label">Unidad productiva</label>
+          <select name="unidad_productiva" id="unidad_productiva" class="form-select form-select-sm">
+            <option value="">Todas</option>
+            {% for u in unidades %}
+              <option value="{{ u.id }}" {% if filtros.unidad_productiva == u.id|stringformat:'s' %}selected{% endif %}>{{ u }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-auto mt-4 d-flex align-items-center justify-content-center gap-2">
+          <button type="submit" class="btn btn-sm btn-outline-primary">Filtrar</button>
+          <a href="{% url 'listado_ingresos' %}" class="btn btn-sm btn-outline-secondary">Limpiar</a>
+          <!-- <a href="{% url 'ingreso_leche' %}" class="btn btn-sm btn-outline-success">+ Nuevo ingreso</a> -->
+        </div>
+      </form>
+
+      <!-- Tabla de resultados -->
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle table-sm small">
+          <thead class="table-primary text-center">
+            <tr>
+              <th>Fecha</th>
+              <th>Unidad Productiva</th>
+              <th>Volumen (L)</th>
+              <th>T.(°C)</th>
+              <th>P. Alcohol</th>
+              <th>pH</th>
+              <th>Acidez</th>
+              <th>ATB</th>
+              <th>Antibiótico</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ingreso in ingresos %}
+            <tr>
+              <td>{{ ingreso.fecha }}</td>
+              <td>{{ ingreso.unidad_productiva }}</td>
+              <td class="text-center">{{ ingreso.volumen }}</td>
+              <td class="text-center">{{ ingreso.temperatura|default:"-" }}</td>
+              <td class="text-center">
+                {% if ingreso.prueba_alcohol %}
+                  <i class="fas fa-times-circle text-danger" title="Rechazada"></i>
+                {% elif ingreso.prueba_alcohol is not None %}
+                  <i class="fas fa-check-circle text-success" title="Aprobada"></i>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td class="text-center">{{ ingreso.ph|default:"-" }}</td>
+              <td class="text-center">{{ ingreso.acidez|default:"-" }}</td>
+              <td class="text-center">
+                {% if ingreso.antibiotico %}
+                  <i class="fas fa-times-circle text-danger" title="Presente"></i>
+                {% elif ingreso.antibiotico is not None %}
+                  <i class="fas fa-check-circle text-success" title="Ausente"></i>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                {% if ingreso.antibiotico and ingreso.tipo_antibiotico %}
+                  <span style="text-align: center; color: red;">{{ ingreso.tipo_antibiotico }}</span>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <a href="{% url 'editar_ingreso' ingreso.id %}" class="text-decoration-none" title="Editar ingreso">
+                  <i class="fas fa-edit" style="color: #0d6efd;"></i>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" class="text-center">No se encontraron ingresos.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

@@ -271,7 +271,7 @@ class UnidadProductiva(models.Model):
     ubicacion = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
-        return f"Unidad Productiva {self.codigo} - {self.razon_social}"
+        return f"{self.codigo} - Renspa: {self.renspa}"
 
 
 # MODELOS RESIDUOS EN LECHE CRUDA
@@ -312,3 +312,21 @@ class InvestigacionAnalitica(models.Model):
 
     def __str__(self):
         return f"{self.muestra} - {self.analito} - Acta {self.numero_acta}"
+    
+# MODELOS REFERENTES CALIDAD DE LECHE CRUDA
+class IngresoLeche(models.Model):
+    unidad_productiva = models.ForeignKey(UnidadProductiva, on_delete=models.CASCADE)
+    fecha = models.DateField()
+    volumen = models.DecimalField(max_digits=6, decimal_places=2)
+    temperatura = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
+    prueba_alcohol = models.BooleanField(null=True, blank=True)
+    ph = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    acidez = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    antibiotico = models.BooleanField(null=True, blank=True)
+    tipo_antibiotico = models.CharField(max_length=100, null=True, blank=True)
+
+    class meta:
+        ordering = ['fecha']
+
+    def __str__(self):
+        return f"{self.fecha} - {self.unidad_productiva} - {self.volumen} Lts."

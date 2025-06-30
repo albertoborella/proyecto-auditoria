@@ -10,6 +10,7 @@ from .views import (home, crear_auditoria, checklist_auditoria, resultado_audito
                     crear_unidad_productiva, listar_unidades_productivas,
                     editar_unidad_productiva, eliminar_unidad_productiva,
                     registro_muestra, detalle_muestra, editar_analito, listado_analisis,
+                    registrar_ingreso_leche, listado_ingresos, editar_ingreso_leche,
                     )
 
 urlpatterns = [
@@ -48,6 +49,10 @@ urlpatterns = [
     path('muestras/<int:pk>/', detalle_muestra, name='detalle_muestra'),
     path('analito/<int:pk>/editar/', editar_analito, name='editar_analito'),
     path('analisis/listado/', listado_analisis, name='listado_analisis'),
+
+    path('ingreso_leche/', registrar_ingreso_leche,  name='ingreso_leche'),
+    path('ingreso_leche/listado/', listado_ingresos, name='listado_ingresos'),
+    path('ingresos/<int:ingreso_id>/editar/', editar_ingreso_leche, name='editar_ingreso'),
 
 ]
 

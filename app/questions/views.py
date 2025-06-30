@@ -27,14 +27,16 @@ from .forms import (
     Ref_noconformidadesForm,
     UnidadProductivaForm,
     MuestraAguaForm, ResultadoAnalisisAguaForm,
-    MuestraLecheForm, InvestigacionAnaliticaForm
+    MuestraLecheForm, InvestigacionAnaliticaForm,
+    IngresoLecheForm,
 )
 
 from .models import (Auditoria, PreguntaPredefinida, Respuesta, Checklist,
                      Ppr, Referencia, Cliente, Norma, TipoSeccion, 
                      Haccp, Ref_haccp, NoConformidades, Ref_noconformidades, 
                      MuestraAgua, ResultadoAnalisisAgua, PlantaIndustrial, TipoAnalisisAgua,
-                     UnidadProductiva, MuestraLeche, Analito, InvestigacionAnalitica)
+                     UnidadProductiva, MuestraLeche, Analito, InvestigacionAnalitica,
+                     IngresoLeche,)
 
 
 def superuser_required(view_func):
@@ -719,4 +721,52 @@ def listado_analisis(request):
         'filtros': filtros
     })
 
+# Funciones sobre Ingreso de Leche y Conrol de Calidad
+def registrar_ingreso_leche(request):
+    if request.method == 'POST':
+        form = IngresoLecheForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listado_ingresos')  # Ajustá esto según tu flujo
+    else:
+        form = IngresoLecheForm()
+
+    return render(request, 'ingreso_leche/registrar_ingreso.html', {'form': form})
+
+def listado_ingresos(request):
+    ingresos = IngresoLeche.objects.select_related('unidad_productiva').order_by('-fecha')
+    unidades = UnidadProductiva.objects.all()
+
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+    unidad_id = request.GET.get('unidad_productiva')
+
+    if fecha_inicio:
+        ingresos = ingresos.filter(fecha__gte=fecha_inicio)
+    if fecha_fin:
+        ingresos = ingresos.filter(fecha__lte=fecha_fin)
+    if unidad_id:
+        ingresos = ingresos.filter(unidad_productiva__id=unidad_id)
+
+    return render(request, 'ingreso_leche/listado_ingresos.html', {
+        'ingresos': ingresos,
+        'unidades': unidades,
+        'filtros': {
+            'fecha_inicio': fecha_inicio,
+            'fecha_fin': fecha_fin,
+            'unidad_productiva': unidad_id,
+        }
+    })
+
+def editar_ingreso_leche(request, ingreso_id):
+    ingreso = get_object_or_404(IngresoLeche, id=ingreso_id)
+    if request.method == 'POST':
+        form = IngresoLecheForm(request.POST, instance=ingreso)
+        if form.is_valid():
+            form.save()
+            return redirect('listado_ingresos')
+    else:
+        form = IngresoLecheForm(instance=ingreso)
+
+    return render(request, 'ingreso_leche/editar_ingreso.html', {'form': form})
 

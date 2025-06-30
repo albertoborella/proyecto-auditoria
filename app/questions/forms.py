@@ -4,7 +4,8 @@ from .models import ( Auditoria, Ppr, Referencia, Norma,
                      Haccp, Ref_haccp, NoConformidades, 
                      Ref_noconformidades, UnidadProductiva, 
                      MuestraAgua, ResultadoAnalisisAgua,
-                     MuestraLeche, InvestigacionAnalitica, )
+                     MuestraLeche, InvestigacionAnalitica,
+                     IngresoLeche, )
 
 class AuditoriaForm(forms.ModelForm):
     class Meta:
@@ -288,6 +289,34 @@ class InvestigacionAnaliticaForm(forms.ModelForm):
         super(InvestigacionAnaliticaForm, self).__init__(*args, **kwargs)
         self.fields['protocolo'].required = False
         self.fields['fecha_resultado'].required = False 
+
+# FORMULARIO PARA INGRESO LECHE Y CALIDAD
+class IngresoLecheForm(forms.ModelForm):
+    class Meta:
+        model = IngresoLeche
+        fields = [
+            'fecha', 'unidad_productiva', 'volumen', 'temperatura',
+            'prueba_alcohol', 'ph', 'acidez', 'antibiotico', 'tipo_antibiotico'
+        ]
+        widgets = {
+            'fecha': forms.DateInput(format='%Y-%m-%d', attrs={'class': 'form-control', 'type': 'date'}),
+            'unidad_productiva': forms.Select(attrs={'class': 'form-select'}),
+            'volumen': forms.NumberInput(attrs={'class': 'form-control'}),
+            'temperatura': forms.NumberInput(attrs={'class': 'form-control'}),
+            'ph': forms.NumberInput(attrs={'class': 'form-control'}),
+            'acidez': forms.NumberInput(attrs={'class': 'form-control'}),
+            'prueba_alcohol': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'antibiotico': forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'id_antibiotico'}),
+            'tipo_antibiotico': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_tipo_antibiotico'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tipo_antibiotico'].required = False
+        self.fields['prueba_alcohol'].label = 'Prueba alcohol (hacer click si es +)'
+        self.fields['antibiotico'].label = 'Prueba alcohol (hacer click si es +)'
+
+        
 
         
 

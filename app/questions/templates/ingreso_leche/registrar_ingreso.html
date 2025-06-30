@@ -1,0 +1,65 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<div style="background-color: #146e6c; min-height: 100vh">
+  <div class="container py-4">
+    <div class="bg-white p-4 rounded-4 shadow-sm">
+      <h4 class="mb-4" style="font-family: 'Times New Roman', Times, serif;">Ingreso de leche a planta</h4>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-4">
+            {{ form.fecha.label_tag }}{{ form.fecha }}
+          </div>
+          <div class="col-md-4">
+            {{ form.unidad_productiva.label_tag }}{{ form.unidad_productiva }}
+          </div>
+          <div class="col-md-4">
+            {{ form.volumen.label_tag }}{{ form.volumen }}
+          </div>
+
+          <div class="col-md-4">
+            {{ form.temperatura.label_tag }}{{ form.temperatura }}
+          </div>
+          <div class="col-md-4">
+            <div class="form-check mt-4">
+              {{ form.prueba_alcohol }} {{ form.prueba_alcohol.label_tag }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            {{ form.ph.label_tag }}{{ form.ph }}
+          </div>
+          <div class="col-md-4">
+            {{ form.acidez.label_tag }}{{ form.acidez }}
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-check mt-4">
+              {{ form.antibiotico }} {{ form.antibiotico.label_tag }}
+            </div>
+          </div>
+          <div class="col-md-8" id="tipo-antibiotico-container" style="display: none;">
+            {{ form.tipo_antibiotico.label_tag }}{{ form.tipo_antibiotico }}
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary">Registrar ingreso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const checkAntibiotico = document.getElementById('id_antibiotico');
+  const inputTipo = document.getElementById('tipo-antibiotico-container');
+
+  function toggleTipoAntibiotico() {
+    inputTipo.style.display = checkAntibiotico.checked ? 'block' : 'none';
+  }
+
+  checkAntibiotico.addEventListener('change', toggleTipoAntibiotico);
+  window.addEventListener('DOMContentLoaded', toggleTipoAntibiotico);
+</script>
+{% endblock %}
