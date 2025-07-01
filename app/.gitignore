@@ -1,0 +1,17 @@
+# Archivos de configuración local
+local_settings.py
+# Archivos de base de datos
+db.sqlite3
+# Archivos de caché
+__pycache__/
+*.pyc
+# Archivos de logs
+*.log
+# Archivos de medios
+media/
+# Archivos de migración
+migrations/
+# Entorno virtual
+venv/
+# Archivos temporales
+tmp/
